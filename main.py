@@ -21,7 +21,8 @@ async def on_message(message):
         await message.channel.send('Hello!')
 
     if message.content.startswith('$bye'):
-        await message.channel.send('bye!')
+        await message.channel.send('```bye!```')
+
     if message.content.startswith('$thumb'):
         channel = message.channel
         await channel.send('Send me that 👍 reaction, mate')
@@ -35,5 +36,4 @@ async def on_message(message):
             await channel.send('👎')
         else:
             await channel.send('👍')
-
 client.run(TOKEN)
