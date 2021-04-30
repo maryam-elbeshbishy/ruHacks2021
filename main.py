@@ -14,6 +14,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    seperator = ">"
 
     if message.author == client.user:
         return
@@ -26,7 +27,7 @@ async def on_message(message):
 
     if message.content.startswith('$addClass'):
         userInput = message.content[9:]
-        information = userInput.split(">")
+        information = userInput.split(seperator)
         acronym = information[0]
         title = information[1]
 
@@ -36,7 +37,7 @@ async def on_message(message):
 
     if message.content.startswith('$addTime_Link'):
         userInput = message.content[13:]
-        information = userInput.split(">")
+        information = userInput.split(seperator)
         acronym = information[0]
         day = information[1]
         hour = information[2]
@@ -49,7 +50,7 @@ async def on_message(message):
     
     if message.content.startswith('$addTextbook'):
         userInput = message.content[12:]
-        information = userInput.split(">")
+        information = userInput.split(seperator)
         acronym = information[0]
         textbook = information[1]
  
@@ -58,7 +59,7 @@ async def on_message(message):
 
     if message.content.startswith('$addToDo'):
         userInput = message.content[8:]
-        information = userInput.split(">")
+        information = userInput.split(seperator)
         toDo = information[1]
         
         f = open("testFile.txt", "a")
