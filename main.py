@@ -46,10 +46,23 @@ async def on_message(message):
         await message.channel.send(day)
         await message.channel.send(hour)
         await message.channel.send(link)
+    
+    
+    if message.content.startswith('$addToDo'):
+        userInput = message.content[8:]
+        information = userInput.split("-")
+        toDo = information[1]
         
+        f = open("testFile.txt", "a")
+        f.write(toDo+"\n")
+        f.close
+
+        await message.channel.send(toDo)
 
 
-
+    if message.content.startswith('$showToDo'):
+        f = open("testFile.txt", "r")
+        await message.channel.send(f.read())
 
 
 
