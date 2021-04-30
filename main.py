@@ -33,9 +33,20 @@ async def on_message(message):
         await message.channel.send(acronym)
         await message.channel.send(title)
 
-        # await message.channel.send(userInput)
-        
 
+    if message.content.startswith('$addTime_Link'):
+        userInput = message.content[13:]
+        information = userInput.split("-")
+        acronym = information[1]
+        day = information[2]
+        hour = information[3]
+        link = information[4]
+
+        await message.channel.send(acronym)
+        await message.channel.send(day)
+        await message.channel.send(hour)
+        await message.channel.send(link)
+        
 
 
 
