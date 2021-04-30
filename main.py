@@ -14,6 +14,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    seperator = ">"
+    command = len(message) + 1
+
     if message.author == client.user:
         return
 
@@ -25,10 +28,10 @@ async def on_message(message):
 
 
     if message.content.startswith('$addClass'):
-        userInput = message.content[9:]
-        information = userInput.split("-")
-        acronym = information[1]
-        title = information[2]
+        userInput = message.content[command:]
+        information = userInput.split(seperator)
+        acronym = information[0]
+        title = information[1]
 
         await message.channel.send(acronym)
         await message.channel.send(title)
