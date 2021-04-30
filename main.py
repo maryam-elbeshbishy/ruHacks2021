@@ -26,7 +26,14 @@ async def on_message(message):
 
     if message.content.startswith('$addClass'):
         userInput = message.content[9:]
-        await message.channel.send(userInput)
+        information = userInput.split("-")
+        acronym = information[1]
+        title = information[2]
+
+        await message.channel.send(acronym)
+        await message.channel.send(title)
+
+        # await message.channel.send(userInput)
         
 
 
