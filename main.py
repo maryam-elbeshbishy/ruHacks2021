@@ -48,7 +48,16 @@ async def on_message(message):
         await message.channel.send(link)
         
 
+    if message.content.startswith('$addTextbook'):
+        userInput = message.content[12:]
+        information = userInput.split("-")
+        acronym = information[1]
+        textbook = information[2]
+ 
+        await message.channel.send(acronym)
+        await message.channel.send(textbook)
 
+        
 
 
 
