@@ -25,14 +25,15 @@ async def on_message(message):
 
     if message.content.startswith('$thumb'):
         channel = message.channel
-        await channel.send('Send me that 👍 reaction, mate')
+        await channel.send('Send me that "hi" reaction, mate')
 
-        def check(reaction, user):
-            return user == message.author and str(reaction.emoji) == '👍'
+        def check(string, user):
+            return user == message.author and string == "hi"
 
-        try:
-            reaction, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
-        except asyncio.TimeoutError:
+        # try:
+        #     # string, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
+        # except asyncio.TimeoutError:
+        if check:
             await channel.send('👎')
         else:
             await channel.send('👍')
