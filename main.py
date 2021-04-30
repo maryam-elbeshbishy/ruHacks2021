@@ -14,8 +14,6 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    seperator = ">"
-    command = len(message) + 1
 
     if message.author == client.user:
         return
@@ -27,10 +25,10 @@ async def on_message(message):
         await message.channel.send('```bye!```')
 
     if message.content.startswith('$addClass'):
-        userInput = message.content[command:]
-        information = userInput.split(seperator)
-        acronym = information[0]
-        title = information[1]
+        userInput = message.content[9:]
+        information = userInput.split(">")
+        acronym = information[1]
+        title = information[2]
 
         await message.channel.send(acronym)
         await message.channel.send(title)
@@ -38,7 +36,7 @@ async def on_message(message):
 
     if message.content.startswith('$addTime_Link'):
         userInput = message.content[13:]
-        information = userInput.split("-")
+        information = userInput.split(">")
         acronym = information[1]
         day = information[2]
         hour = information[3]
@@ -52,7 +50,7 @@ async def on_message(message):
     
     if message.content.startswith('$addToDo'):
         userInput = message.content[8:]
-        information = userInput.split("-")
+        information = userInput.split(">")
         toDo = information[1]
         
         f = open("testFile.txt", "a")
@@ -63,7 +61,7 @@ async def on_message(message):
         
     if message.content.startswith('$addTextbook'):
         userInput = message.content[12:]
-        information = userInput.split("-")
+        information = userInput.split(">")
         acronym = information[1]
         textbook = information[2]
  
