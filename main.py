@@ -26,7 +26,6 @@ async def on_message(message):
     if message.content.startswith('$bye'):
         await message.channel.send('```bye!```')
 
-
     if message.content.startswith('$addClass'):
         userInput = message.content[command:]
         information = userInput.split(seperator)
