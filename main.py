@@ -36,4 +36,57 @@ async def on_message(message):
             await channel.send('👎')
         else:
             await channel.send('👍')
+
+    if message.content.startswith('$addClass'):
+        userInput = message.content[9:]
+        information = userInput.split("-")
+        acronym = information[1]
+        title = information[2]
+
+        await message.channel.send(acronym)
+        await message.channel.send(title)
+
+
+    if message.content.startswith('$addTime_Link'):
+        userInput = message.content[13:]
+        information = userInput.split("-")
+        acronym = information[1]
+        day = information[2]
+        hour = information[3]
+        link = information[4]
+
+        await message.channel.send(acronym)
+        await message.channel.send(day)
+        await message.channel.send(hour)
+        await message.channel.send(link)
+        
+
+    if message.content.startswith('$addTextbook'):
+        userInput = message.content[12:]
+        information = userInput.split("-")
+        acronym = information[1]
+        textbook = information[2]
+ 
+        await message.channel.send(acronym)
+        await message.channel.send(textbook)
+
+        
+
+
+
+
+    # if message.content.startswith('$thumb'):
+    #     channel = message.channel
+    #     await channel.send('Send me that "hi" reaction, mate')
+
+    #     def check(string, user):
+    #         return user == message.author and string == "hi"
+
+    #     # try:
+    #     #     # string, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
+    #     # except asyncio.TimeoutError:
+    #     if check:
+    #         await channel.send('👎')
+    #     else:
+    #         await channel.send('👍')
 client.run(TOKEN)
