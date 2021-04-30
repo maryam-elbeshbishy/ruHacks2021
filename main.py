@@ -23,18 +23,30 @@ async def on_message(message):
     if message.content.startswith('$bye'):
         await message.channel.send('```bye!```')
 
-    if message.content.startswith('$thumb'):
-        channel = message.channel
-        await channel.send('Send me that "hi" reaction, mate')
 
-        def check(string, user):
-            return user == message.author and string == "hi"
+    if message.content.startswith('$addClass'):
+        userInput = message.content[8:]
+        await client.send_message(message.channel, userInput)
+        
 
-        # try:
-        #     # string, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
-        # except asyncio.TimeoutError:
-        if check:
-            await channel.send('👎')
-        else:
-            await channel.send('👍')
+
+
+
+
+
+
+    # if message.content.startswith('$thumb'):
+    #     channel = message.channel
+    #     await channel.send('Send me that "hi" reaction, mate')
+
+    #     def check(string, user):
+    #         return user == message.author and string == "hi"
+
+    #     # try:
+    #     #     # string, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
+    #     # except asyncio.TimeoutError:
+    #     if check:
+    #         await channel.send('👎')
+    #     else:
+    #         await channel.send('👍')
 client.run(TOKEN)
