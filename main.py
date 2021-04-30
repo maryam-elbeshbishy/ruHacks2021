@@ -26,7 +26,7 @@ async def on_message(message):
 
     if message.content.startswith('$addClass'):
         userInput = message.content[8:]
-        await client.send_message(userInput)
+        await message.channel.send(userInput)
         
 
 
