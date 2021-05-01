@@ -65,6 +65,7 @@ async def on_message(message):
     if message.content.startswith('$addToDo'):
         userInput = message.content[8:]
         information = userInput.split(seperator)
+<<<<<<< HEAD
         f = open("testFile.txt", "a")
         count = len(open("testFile.txt").readlines(  )) + 1
         for toDo in information:
