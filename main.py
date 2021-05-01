@@ -60,7 +60,7 @@ async def on_message(message):
     if message.content.startswith('$addToDo'):
         userInput = message.content[8:]
         information = userInput.split(seperator)
-        toDo = information[1]
+        toDo = information[0]
         
         f = open("testFile.txt", "a")
         f.write(toDo+"\n")
