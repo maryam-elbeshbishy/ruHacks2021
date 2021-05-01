@@ -81,8 +81,28 @@ async def on_message(message):
 
         embed=discord.Embed(title="Todo List", description="Here is a list of the things you have to get done 💼", color=discord.Color.blue())
         embed.add_field(name="List",value=lst,inline=True)
-        embed.set_author(name="EduBot", icon_url="https://images.pexels.com/photos/3299/postit-scrabble-to-do.jpg?auto=compress&cs=tinysrgb&h=650&w=940")
         await message.channel.send(embed=embed)
+
+    if message.content.startswith('$removeToDo'):
+        userInput = message.content[11:]
+        information = userInput.split(seperator)
+        f = open("testFile.txt", "r")
+        lines = f.readlines()
+        f.close
+
+        f2 = open("testFile.txt", "w")
+        for line in lines:
+            nLine = line.split(')')
+            print(nLine[0])
+            if(int(nLine[0])!=int(information[0])):
+                f2.write(line)
+            elif(nLine[0][0] == "~"):
+                pass
+            else:
+                line = "~~"+line+"~~\n"
+                f2.write(line)
+
+        f2.close
         
     if message.content.startswith('$clearTodo'):
         open('toDoList.txt', 'w').close()
