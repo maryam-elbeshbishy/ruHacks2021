@@ -79,18 +79,21 @@ async def on_message(message):
         for todo in lines:
             lst+=todo+"\n"
 
-        embed=discord.Embed(title="Todo List", description="Here is a list of the things you have to get done 💼", color=discord.Color.blue())
+        embed=discord.Embed(title="Todo List", description="Here is a list of the things you have to get done 💼")
         embed.add_field(name="List",value=lst,inline=True)
+        # embed.color= '10038562'
         await message.channel.send(embed=embed)
+        # await message.channel.send(str(lines))
+
 
     if message.content.startswith('$removeToDo'):
         userInput = message.content[11:]
         information = userInput.split(seperator)
-        f = open("testFile.txt", "r")
+        f = open("toDoList.txt", "r")
         lines = f.readlines()
         f.close
 
-        f2 = open("testFile.txt", "w")
+        f2 = open("toDoList.txt", "w")
         for line in lines:
             nLine = line.split(')')
             print(nLine[0])
@@ -99,10 +102,11 @@ async def on_message(message):
             elif(nLine[0][0] == "~"):
                 pass
             else:
-                line = "~~"+line+"~~\n"
+                line = "~~"+line+"~~"
                 f2.write(line)
 
         f2.close
+
         
     if message.content.startswith('$clearTodo'):
         open('toDoList.txt', 'w').close()
