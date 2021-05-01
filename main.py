@@ -62,6 +62,8 @@ async def on_ready():
     );
     """)
 
+    
+
 @client.event
 async def on_message(message):
     seperator = ">"
@@ -83,7 +85,6 @@ async def on_message(message):
         ('{}','{}',NULL,NULL,NULL,NULL);
         """.format(acronym,title))
         await message.channel.send("The class has been added 🏫")
-        show_dataBase()
 
     # ---------------------------- ADDING CLASS INFORMATION ----------------------------
     if message.content.startswith('$addTime_Link'):
@@ -124,6 +125,7 @@ async def on_message(message):
             await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
             return
         
+
         cur.execute("""
         UPDATE EduBot
         SET textBook = '{}'
@@ -135,7 +137,8 @@ async def on_message(message):
     if "chick" in message.content:
         await message.channel.send("hello")
 
-    # ---------------------------- GET CLASS TITLE ----------------------------
+    # ---------------------------- RETRIEVING DATA FROM DB----------------------------
+
     if message.content.startswith('$getClassTitle'):
         userInput = message.content[15:]
         information = userInput.split(seperator)
@@ -157,7 +160,7 @@ async def on_message(message):
         else:
             await message.channel.send("ℹ The course title of {} is: {}.".format(acronym,title[0][0]))
 
-    # ---------------------------- GET MEETING LINK ----------------------------
+
     if message.content.startswith('$getClassCode'):
         userInput = message.content[14:]
         information = userInput.split(seperator)
@@ -178,8 +181,6 @@ async def on_message(message):
         else:
             await message.channel.send("ℹ The course code of {} is: {}.".format(title,code[0][0]))
     
-
-    # ---------------------------- GET MEETING LINK ----------------------------
     if message.content.startswith('$getMeetingLink'):
         userInput = message.content[16:]
         information = userInput.split(seperator)
@@ -198,13 +199,11 @@ async def on_message(message):
             await message.channel.send("There is no meeting link for {} 😯".format(acronym))
         else:
             await message.channel.send("🔗 The meeting link for {} is: {}".format(acronym,link[0][0]))
-
-    # ---------------------------- GET TEXTBOOK ----------------------------
+           
     if message.content.startswith('$getTextbook'):
         userInput = message.content[13:]
         information = userInput.split(seperator)
         acronym = information[0].upper().strip()
-
         if not check_code(acronym):
             await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
             return
@@ -220,44 +219,28 @@ async def on_message(message):
         else:
             await message.channel.send("🔗 The textbook link for {} is: {}".format(acronym,text[0][0]))
 
-    # ---------------------------- SCHEDULE ----------------------------
-
-    # ------------- GET SCHEDULE --------------- 
     if message.content.startswith('$getSchedule'):
-        lst = ""
-        cur.execute("""
-            SELECT courseCode, courseName, dayWeek, timeWeek FROM EduBot;
-        """)   
-        information = cur.fetchall()
-        conn.commit()
+        userInput = message.content[13:]
+        information = userInput.split(seperator)
+        acronym = information[0].upper().strip()
+        # title = information[1].title().strip()
+        #CHECK IF IN THERE ALREADY
+        # cur.execute("""
+        # INSERT INTO EduBot VALUES
+        # ('{}','{}',NULL,NULL,NULL,NULL);
+        # """.format(acronym,title))
+        # await message.channel.send("The class has been added 🏫")
+        # show_dataBase()
+        # if link[0][0] =="None":
+        #     await message.channel.send("There is course code for {} 😯".format(acronym))
+        # else:
+        await message.channel.send(acronym)
 
-        if len(information) == 0:
-            lst += "There are no classes this week 😯"
-
-        for c in range(len(information)):
-                lst += ("{} {} [ {} @ {}]\n".format(information[c][0], information[c][1], information[c][2], information[c][3]))
-
-        embed=discord.Embed(title="Weekly Schedule", description="Here is your weekly schedule 💼", color=discord.Color.blue())
-        embed.add_field(name="This Week",value=lst,inline=True)
-        await message.channel.send(embed=embed)
-
-    # ------------- CLEAR SCHEDULE --------------- 
     if message.content.startswith('$clearSchedule'):
         cur.execute("""
-            DROP TABLE EduBot;
+                TRUNCATE TABLE EduBot;
         """)
-        conn.commit()
         await message.channel.send("Your schedule has been cleared :basket:")
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS EduBot (
-            courseCode VARCHAR,
-            courseName VARCHAR,
-            textBook VARCHAR,
-            meetingLink VARCHAR,
-            dayWeek VARCHAR,
-            timeWeek VARCHAR
-            );
-        """)
 
     # ---------------------------- TO DO LIST ----------------------------
 
