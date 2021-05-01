@@ -22,6 +22,7 @@ async def on_message(message):
         return
         
     # ---------------------------- ADD CLASS TITLE + ACRONYM ----------------------------
+    
     if message.content.startswith('$addClass'):
         userInput = message.content[10:]
         information = userInput.split(seperator)
