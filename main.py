@@ -19,6 +19,7 @@ async def on_message(message):
     if message.author == client.user:
         return    
 
+    # ---------------------------- ADDING CLASS ----------------------------
     if message.content.startswith('$addClass'):
         userInput = message.content[10:]
         information = userInput.split(seperator)
@@ -61,6 +62,8 @@ async def on_message(message):
         await message.channel.send("hello")
 
     # ---------------------------- TO DO LIST ----------------------------
+
+    # ------------- ADD TO DO --------------- 
     if message.content.startswith('$addToDo'):
         userInput = message.content[9:]
         information = userInput.split(seperator)
@@ -72,23 +75,30 @@ async def on_message(message):
         f.close
         await message.channel.send("The task(s) has been added ⌚")
 
-
+    # ------------- SHOW TO DO ---------------  
     if message.content.startswith('$showToDo'):
         lst= ""
-        f = open("toDoList.txt")
+
+        f = open("toDoList.txt", "a")
+        f.close
+
+        f = open("toDoList.txt", "r")
         lines = f.readlines()
 
         if len(lines)==0:
             await message.channel.send("The Todo List is empty 😯")
             return
         for todo in lines:
-            lst+=todo+"\n"
+            if(str(todo[0]) == "~"):
+                lst+=todo
+            else:
+                lst+=todo+"\n"
 
         embed=discord.Embed(title="Todo List", description="Here is a list of the things you have to get done 💼")
         embed.add_field(name="List",value=lst,inline=True)
         await message.channel.send(embed=embed)
 
-
+    # ------------- REMOVE TO DO ---------------  
     if message.content.startswith('$removeToDo'):
         userInput = message.content[11:]
         information = userInput.split(seperator)
@@ -99,26 +109,28 @@ async def on_message(message):
         f2 = open("toDoList.txt", "w")
         for line in lines:
             nLine = line.split(')')
-            print(nLine[0])
-          
-            if( nLine[0][0] == "~"):
-                pass
+            
+            if(str(nLine[0][0]) == "~" or str(nLine[0][0]) == ""):
+                f2.write(line)
             elif(int(nLine[0])!=int(information[0])):
                 f2.write(line)
+                
             else:
-                await message.channel.send("The task has been removed 🧺")
-                line = "~~"+line+"~~"
+                await message.channel.send("The task has been removed :basket:")
+                line = "~~"+line+"~~\n"
                 f2.write(line)
 
         f2.close
 
-        
+    # ------------- CLEAR TO DO ---------------    
     if message.content.startswith('$clearTodo'):
         open('toDoList.txt', 'w').close()
         await message.channel.send("Todo List has been cleared✅")
 
 
     # ---------------------------- IMPORTANT DATES ----------------------------
+
+    # ------------- ADD DATE ---------------
     if message.content.startswith('$addImpDates'):
         userInput = message.content[13:]
         information = userInput.split(seperator)
@@ -134,22 +146,38 @@ async def on_message(message):
         f.write(str(count)+ ") " + title + " [ " + date + " @ " + hour + " ]" + "\n")
         count+=1
         f.close
+        await message.channel.send("The date has been added ⌚")
 
+    # ------------- SHOW DATE ---------------
     if message.content.startswith('$showImpDates'):
         lst= ""
-        f = open("ImpDates.txt")
+        
+        f = open("ImpDates.txt", "a")
+        f.close
+
+        f = open("ImpDates.txt", "r")
         lines = f.readlines()
+
+        if len(lines)==0:
+            await message.channel.send("The Important Dates list is empty 😯")
+            return
+
         for todo in lines:
-            lst+=todo+"\n"
+            if(str(todo[0]) == "~"):
+                lst+=todo
+            else:
+                lst+=todo+"\n"
 
         embed=discord.Embed(title="Important Dates", description="Here is a list of upcoming important dates 💼", color=discord.Color.blue())
         embed.add_field(name="List",value=lst,inline=True)
         await message.channel.send(embed=embed)
 
+    # ------------- CLEAR DATE ---------------
     if message.content.startswith('$clearImpDates'):
         open('ImpDates.txt', 'w').close()
         await message.channel.send("Important Dates has been cleared ✅")
 
+    # ------------- REMOVE DATE ---------------
     if message.content.startswith('$removeImpDates'):
         userInput = message.content[16:]
         information = userInput.split(seperator)
@@ -160,17 +188,33 @@ async def on_message(message):
         f2 = open("ImpDates.txt", "w")
         for line in lines:
             nLine = line.split(')')
-            print(nLine[0])
-            if(int(nLine[0])!=int(information[0])):
-                f2.write(line)
-            elif(nLine[0][0] == "~"):
-                pass
-            else:
-                line = "~~"+line+"~~"
-                f2.write(line)
 
+            if(str(nLine[0][0]) == "~" or str(nLine[0][0]) == ""):
+                f2.write(line)
+            elif(int(nLine[0])!=int(information[0])):
+                f2.write(line)
+                
+            else:
+                await message.channel.send("The date has been removed :basket:")
+                line = "~~"+line+"~~\n"
+                f2.write(line)
 
         f2.close
 
+    # ---------------------------- HELP COMMAND ----------------------------
+    if message.content.startswith('$help'):
+        embed=discord.Embed(title="Commands", description="Here's a list of the commands and how to use them!", color=0x78c6dd)
+        embed.add_field(name="$addClass", value="$addClass CourseCode>CourseName\nAdd a class to your schedule", inline=False)
+        embed.add_field(name="$addTextbook", value="$addTextbook TextbookName\nAdd a textbook link to stay organized", inline=False)
+        embed.add_field(name="$addToDo", value="$addToDo Task\nAdd a task to your to do list", inline=False)
+        embed.add_field(name="$addImpDates", value="$addImpDates Date>Time>Name\nSave important assignments and dates to be notified", inline=False)
+        embed.add_field(name="$removeToDo", value="$removeToDo Task\nCross out a task once youre done", inline=False)
+        embed.add_field(name="$removeImpDates", value="$remove Date>Time>Name\nRemove an important date once it is over", inline=False)
+        embed.add_field(name="$showToDo", value="Lists your to do list", inline=False)
+        embed.add_field(name="$showImpDate", value="Lists your important dates", inline=False)
+        embed.add_field(name="$clearToDo", value="Clears all items off to do list", inline=False)
+        embed.add_field(name="$clearImpDates", value="Clears all items off important dates list", inline=False)
+        embed.add_field(name="$addTime_Link", value="$addTime_Link CourseCode>Day>Time>MeetingLink\nAdd a new meeting link for your lectures, by course code", inline=True)
+        await message.channel.send(embed=embed)
 
 client.run(TOKEN)
