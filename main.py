@@ -16,6 +16,8 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    seperator = ">"
+
     if message.author == client.user:
         return
 
@@ -27,9 +29,9 @@ async def on_message(message):
 
     if message.content.startswith('$addClass'):
         userInput = message.content[9:]
-        information = userInput.split("-")
-        acronym = information[1]
-        title = information[2]
+        information = userInput.split(seperator)
+        acronym = information[0]
+        title = information[1]
 
         await message.channel.send(acronym)
         await message.channel.send(title)
@@ -37,23 +39,22 @@ async def on_message(message):
 
     if message.content.startswith('$addTime_Link'):
         userInput = message.content[13:]
-        information = userInput.split("-")
-        acronym = information[1]
-        day = information[2]
-        hour = information[3]
-        link = information[4]
+        information = userInput.split(seperator)
+        acronym = information[0]
+        day = information[1]
+        hour = information[2]
+        link = information[3]
 
         await message.channel.send(acronym)
         await message.channel.send(day)
         await message.channel.send(hour)
         await message.channel.send(link)
-        
-
+    
     if message.content.startswith('$addTextbook'):
         userInput = message.content[12:]
-        information = userInput.split("-")
-        acronym = information[1]
-        textbook = information[2]
+        information = userInput.split(seperator)
+        acronym = information[0]
+        textbook = information[1]
  
         await message.channel.send(acronym)
         await message.channel.send(textbook)
@@ -61,6 +62,20 @@ async def on_message(message):
     if "chick" in message.content:
         await message.channel.send("hello")
 
+    if message.content.startswith('$addToDo'):
+        userInput = message.content[8:]
+        information = userInput.split(seperator)
+        f = open("testFile.txt", "a")
+
+        for toDo in information:
+            count = len(open("testFile.txt").readlines(  )) + 1 # The number is not incrementing, it always prints 1
+            f.write(str(count)+ ") " + toDo + "\n")
+        
+        f.close
+
+    if message.content.startswith('$showToDo'):
+        f = open("testFile.txt", "r")
+        await message.channel.send(f.read())
 
         
 
