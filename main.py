@@ -60,13 +60,13 @@ async def on_message(message):
     if message.content.startswith('$addToDo'):
         userInput = message.content[8:]
         information = userInput.split(seperator)
-        toDo = information[0]
-        
         f = open("testFile.txt", "a")
-        f.write(toDo+"\n")
-        f.close
 
-        await message.channel.send(toDo)    
+        for toDo in information:
+            count = len(open("testFile.txt").readlines(  )) + 1 # The number is not incrementing, it always prints 1
+            f.write(str(count)+ ") " + toDo + "\n")
+        
+        f.close
 
     if message.content.startswith('$showToDo'):
         f = open("testFile.txt", "r")
