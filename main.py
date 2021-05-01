@@ -59,27 +59,45 @@ async def on_message(message):
         await message.channel.send(acronym)
         await message.channel.send(textbook)
     
-    if "chick" in message.content:
-        await message.channel.send("hello")
+    # if "chick" in message.content:
+    #     await message.channel.send("hello")
 
     if message.content.startswith('$addToDo'):
         userInput = message.content[8:]
         information = userInput.split(seperator)
         f = open("testFile.txt", "a")
-
+        count = len(open("testFile.txt").readlines(  )) + 1
         for toDo in information:
-            count = len(open("testFile.txt").readlines(  )) + 1 # The number is not incrementing, it always prints 1
+             # The number is not incrementing, it always prints 1
             f.write(str(count)+ ") " + toDo + "\n")
+            count+=1
         
         f.close
 
     if message.content.startswith('$showToDo'):
         f = open("testFile.txt", "r")
         await message.channel.send(f.read())
+   
+    if message.content.startswith('$removeToDo'):
+        userInput = message.content[11:]
+        information = userInput.split(seperator)
+        f = open("testFile.txt", "r")
+        lines = f.readlines()
+        f.close
 
-        
+        f2 = open("testFile.txt", "w")
+        for line in lines:
+            nLine = line.split(')')
+            print(nLine[0])
+            if(int(nLine[0])!=int(information[0])):
+                f2.write(line)
+            elif(nLine[0][0] == "~"):
+                pass
+            else:
+                line = "~~"+line+"~~"
+                f2.write(line)
 
-
+        f2.close
     # if message.content.startswith('$thumb'):
     #     channel = message.channel
     #     await channel.send('Send me that "hi" reaction, mate')
