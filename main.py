@@ -19,7 +19,7 @@ async def on_message(message):
     if message.author == client.user:
         return    
 
-    # ---------------------------- ADDING CLASS ----------------------------
+    # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$addClass'):
         userInput = message.content[10:]
         information = userInput.split(seperator)
@@ -43,7 +43,7 @@ async def on_message(message):
         await message.channel.send(day)
         await message.channel.send(hour)
         await message.channel.send(link)
-        await message.channel.send("The class information has been added🏫")
+        await message.channel.send("The class information has been added 🏫")
 
     
     # ---------------------------- ADD TEXTBOOK ----------------------------
@@ -146,7 +146,7 @@ async def on_message(message):
         f.write(str(count)+ ") " + title + " [ " + date + " @ " + hour + " ]" + "\n")
         count+=1
         f.close
-        await message.channel.send("The date has been added ⌚")
+        await message.channel.send("The important date has been added ⌚")
 
     # ------------- SHOW DATE ---------------
     if message.content.startswith('$showImpDates'):
@@ -175,7 +175,7 @@ async def on_message(message):
     # ------------- CLEAR DATE ---------------
     if message.content.startswith('$clearImpDates'):
         open('ImpDates.txt', 'w').close()
-        await message.channel.send("Important Dates has been cleared ✅")
+        await message.channel.send("Important dates has been cleared ✅")
 
     # ------------- REMOVE DATE ---------------
     if message.content.startswith('$removeImpDates'):
