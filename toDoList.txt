@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 1)  bed
 2) bed
 3) bed
@@ -20,3 +21,32 @@
 20) bed
 21) bed
 22) bed
+=======
+1)  test6
+2) test5
+3) Test4
+4)  test6
+5) test5
+6) Test4
+7)  hello
+8)  test6
+9) test5
+10) Test4
+11)  test6
+12) test5
+13) Test4
+14)  test`
+15)  test6
+16) test5
+17) Test4
+18)  testing
+19)  Maryam
+20)  Dee
+21)  Shoelace
+22) sholeh
+23) Dee
+24) Maryam
+25) sholeh
+26) Dee
+27) Maryam
+>>>>>>> d71bd6a742ed0d1c9a617a4db17885ebf5da0ad9

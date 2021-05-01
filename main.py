@@ -20,7 +20,7 @@ async def on_message(message):
         return
 
     if message.content.startswith('$addClass'):
-        userInput = message.content[9:]
+        userInput = message.content[10:]
         information = userInput.split(seperator)
         acronym = information[0]
         title = information[1]
@@ -31,7 +31,7 @@ async def on_message(message):
 
 
     if message.content.startswith('$addTime_Link'):
-        userInput = message.content[13:]
+        userInput = message.content[14:]
         information = userInput.split(seperator)
         acronym = information[0]
         day = information[1]
@@ -46,7 +46,7 @@ async def on_message(message):
 
     
     if message.content.startswith('$addTextbook'):
-        userInput = message.content[12:]
+        userInput = message.content[13:]
         information = userInput.split(seperator)
         acronym = information[0]
         textbook = information[1]
@@ -60,7 +60,7 @@ async def on_message(message):
         await message.channel.send("hello")
 
     if message.content.startswith('$addToDo'):
-        userInput = message.content[8:]
+        userInput = message.content[9:]
         information = userInput.split(seperator)
         f = open("toDoList.txt", "a")
         count = len(open("toDoList.txt").readlines(  )) + 1 # The number is not incrementing, it always prints 1
@@ -113,7 +113,44 @@ async def on_message(message):
         
     if message.content.startswith('$clearTodo'):
         open('toDoList.txt', 'w').close()
-        await message.channel.send("Todo List has been cleared ✅")
+        await message.channel.send("Todo List has been cleared✅")
+
+
+    if message.content.startswith('$addImpDates'):
+        userInput = message.content[13:]
+        information = userInput.split(seperator)
+        title = information[0]
+        dateInput = information[1]
+
+        dateInfo = dateInput.split(" ")
+        date = dateInfo[0]
+        hour = dateInfo[1]
+
+        f = open("ImpDates.txt", "a")
+        countD = len(open("ImpDates.txt").readlines(  )) + 1 
+        f.write(str(countD)+ ") " + title + " [ " + date + " @ " + hour + " ]" + "\n")
+        countD+=1
+        f.close
+
+    if message.content.startswith('$showImpDates'):
+        lst= ""
+        f = open("ImpDates.txt")
+        lines = f.readlines()
+        for todo in lines:
+            lst+=todo+"\n"
+
+        embed=discord.Embed(title="Important Dates", description="Here is a list of upcoming important dates💼", color=discord.Color.blue())
+        embed.add_field(name="List",value=lst,inline=True)
+        await message.channel.send(embed=embed)
+
+    if message.content.startswith('$clearImpDates'):
+        open('ImpDates.txt', 'w').close()
+        await message.channel.send("Important Dates has been cleared✅")
+
+
+    # if message.content.startswith('$thumb'):
+    #     channel = message.channel
+    #     await channel.send('Send me that "hi" reaction, mate')
 
 
 client.run(TOKEN)
