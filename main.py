@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
-bot = commands.Bot(command_prefix='>')
+# bot = commands.Bot(command_prefix='>')
 
 @client.event
 async def on_ready():
@@ -81,7 +81,7 @@ async def on_message(message):
 
         embed=discord.Embed(title="Todo List", description="Here is a list of the things you have to get done 💼", color=discord.Color.blue())
         embed.add_field(name="List",value=lst,inline=True)
-        # embed.set_author(name="RealDrewData", url="https://twitter.com/RealDrewData", icon_url="https://pbs.twimg.com/profile_images/1327036716226646017/ZuaMDdtm_400x400.jpg")
+        embed.set_author(name="EduBot", icon_url="https://images.pexels.com/photos/3299/postit-scrabble-to-do.jpg?auto=compress&cs=tinysrgb&h=650&w=940")
         await message.channel.send(embed=embed)
         
     if message.content.startswith('$clearTodo'):
