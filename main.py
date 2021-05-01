@@ -99,7 +99,7 @@ async def on_message(message):
         
         cur.execute("""
         UPDATE EduBot
-        SET textbook = '{}'
+        SET textBook = '{}'
         WHERE courseCode = '{}';
         """.format(textbook,acronym))
         await message.channel.send("The textbook has been added 📚")
@@ -110,6 +110,79 @@ async def on_message(message):
     
     if "chick" in message.content:
         await message.channel.send("hello")
+
+    # ---------------------------- RETRIEVING DATA FROM DB----------------------------
+
+    if message.content.startswith('$getClassTitle'):
+            userInput = message.content[15:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
+            
+            #CHECK IF IN THERE ALREADY
+            cur.execute("""
+                SELECT courseName FROM EduBot 
+                WHERE courseCode = '{}';
+            """.format(acronym))
+            title = cur.fetchall()
+            conn.commit()
+            await message.channel.send("ℹ The course title of {} is: {}.".format(acronym,title[0][0]))
+
+
+    if message.content.startswith('$getClassCode'):
+            userInput = message.content[14:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
+           
+            #CHECK IF IN THERE ALREADY
+            cur.execute("""
+                SELECT courseCode FROM EduBot 
+                WHERE courseName = '{}';
+            """.format(acronym))
+            code = cur.fetchall()
+            conn.commit()
+            await message.channel.send("ℹ The course code of {} is: {}.".format(title,code[0][0]))
+    
+    if message.content.startswith('$getMeetingLink'):
+            userInput = message.content[16:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
+        
+            #CHECK IF IN THERE ALREADY
+            cur.execute("""
+                SELECT meetingLink FROM EduBot 
+                WHERE courseCode = '{}';
+            """.format(acronym))
+            link = cur.fetchall()
+            conn.commit()
+            await message.channel.send("🔗 The meeting link for {} is: {}".format(acronym,link[0][0]))
+            # await message.channel.send(acronym)
+            # await message.channel.send(title)`
+    if message.content.startswith('$getTextbook'):
+        userInput = message.content[13:]
+        information = userInput.split(seperator)
+        acronym = information[0].upper().strip()
+        #CHECK IF IN THERE ALREADY
+        cur.execute("""
+            SELECT textBook FROM EduBot 
+            WHERE courseCode = '{}';
+        """.format(acronym))
+        text = cur.fetchall()
+        conn.commit()
+        await message.channel.send("🔗 The textbook link for {}  is: {}".format(acronym,text[0][0]))
+
+    if message.content.startswith('$getSchedule'):
+        userInput = message.content[13:]
+        information = userInput.split(seperator)
+        acronym = information[0].upper().strip()
+        # title = information[1].title().strip()
+        #CHECK IF IN THERE ALREADY
+        # cur.execute("""
+        # INSERT INTO EduBot VALUES
+        # ('{}','{}',NULL,NULL,NULL,NULL);
+        # """.format(acronym,title))
+        # await message.channel.send("The class has been added 🏫")
+        # show_dataBase()
+        await message.channel.send(acronym)
 
     # ---------------------------- TO DO LIST ----------------------------
 
