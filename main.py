@@ -21,17 +21,12 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
-
-    if message.content.startswith('$bye'):
-        await message.channel.send('```bye!```')
-
     if message.content.startswith('$addClass'):
         userInput = message.content[9:]
         information = userInput.split(seperator)
         acronym = information[0]
         title = information[1]
+        await message.channel.send("The class has been added 🏫")
 
         await message.channel.send(acronym)
         await message.channel.send(title)
@@ -49,12 +44,16 @@ async def on_message(message):
         await message.channel.send(day)
         await message.channel.send(hour)
         await message.channel.send(link)
+        await message.channel.send("The class information has been added🏫")
+
     
     if message.content.startswith('$addTextbook'):
         userInput = message.content[12:]
         information = userInput.split(seperator)
         acronym = information[0]
         textbook = information[1]
+        await message.channel.send("The textbook has been added 📚")
+
  
         await message.channel.send(acronym)
         await message.channel.send(textbook)
@@ -71,19 +70,23 @@ async def on_message(message):
             f.write(str(count)+ ") " + toDo + "\n")
             count+=1
         f.close
+        await message.channel.send("The task(s) has been added ⌚")
+
 
     if message.content.startswith('$showToDo'):
         lst= ""
         f = open("toDoList.txt")
         lines = f.readlines()
+
+        if len(lines)==0:
+            await message.channel.send("The Todo List is empty 😯")
+            return
         for todo in lines:
             lst+=todo+"\n"
 
         embed=discord.Embed(title="Todo List", description="Here is a list of the things you have to get done 💼")
         embed.add_field(name="List",value=lst,inline=True)
-        # embed.color= '10038562'
         await message.channel.send(embed=embed)
-        # await message.channel.send(str(lines))
 
 
     if message.content.startswith('$removeToDo'):
@@ -97,11 +100,13 @@ async def on_message(message):
         for line in lines:
             nLine = line.split(')')
             print(nLine[0])
-            if(int(nLine[0])!=int(information[0])):
-                f2.write(line)
-            elif(nLine[0][0] == "~"):
+          
+            if( nLine[0][0] == "~"):
                 pass
+            elif(int(nLine[0])!=int(information[0])):
+                f2.write(line)
             else:
+                await message.channel.send("The task has been remove 🧺")
                 line = "~~"+line+"~~"
                 f2.write(line)
 
@@ -110,23 +115,7 @@ async def on_message(message):
         
     if message.content.startswith('$clearTodo'):
         open('toDoList.txt', 'w').close()
-        await message.channel.send("Todo List has been cleared✅")
+        await message.channel.send("Todo List has been cleared ✅")
 
 
-
-
-    # if message.content.startswith('$thumb'):
-    #     channel = message.channel
-    #     await channel.send('Send me that "hi" reaction, mate')
-
-    #     def check(string, user):
-    #         return user == message.author and string == "hi"
-
-    #     # try:
-    #     #     # string, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
-    #     # except asyncio.TimeoutError:
-    #     if check:
-    #         await channel.send('👎')
-    #     else:
-    #         await channel.send('👍')
 client.run(TOKEN)
