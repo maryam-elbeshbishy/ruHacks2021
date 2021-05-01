@@ -20,13 +20,8 @@ async def on_message(message):
 
     if message.author == client.user:
         return
-
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
-
-    if message.content.startswith('$bye'):
-        await message.channel.send('```bye!```')
-
+        
+    # ---------------------------- ADD CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$addClass'):
         userInput = message.content[10:]
         information = userInput.split(seperator)
@@ -36,7 +31,7 @@ async def on_message(message):
         await message.channel.send(acronym)
         await message.channel.send(title)
 
-
+    # ---------------------------- ADDING CLASS INFORMATION ----------------------------
     if message.content.startswith('$addTime_Link'):
         userInput = message.content[14:]
         information = userInput.split(seperator)
@@ -50,6 +45,7 @@ async def on_message(message):
         await message.channel.send(hour)
         await message.channel.send(link)
     
+    # ---------------------------- ADD TEXTBOOK ----------------------------
     if message.content.startswith('$addTextbook'):
         userInput = message.content[13:]
         information = userInput.split(seperator)
@@ -62,6 +58,7 @@ async def on_message(message):
     if "chick" in message.content:
         await message.channel.send("hello")
 
+    # ---------------------------- TO DO LIST ----------------------------
     if message.content.startswith('$addToDo'):
         userInput = message.content[9:]
         information = userInput.split(seperator)
@@ -109,6 +106,7 @@ async def on_message(message):
         await message.channel.send("Todo List has been cleared✅")
 
 
+    # ---------------------------- IMPORTANT DATES ----------------------------
     if message.content.startswith('$addImpDates'):
         userInput = message.content[13:]
         information = userInput.split(seperator)
@@ -120,9 +118,9 @@ async def on_message(message):
         hour = dateInfo[1]
 
         f = open("ImpDates.txt", "a")
-        countD = len(open("ImpDates.txt").readlines(  )) + 1 
-        f.write(str(countD)+ ") " + title + " [ " + date + " @ " + hour + " ]" + "\n")
-        countD+=1
+        count = len(open("ImpDates.txt").readlines(  )) + 1 
+        f.write(str(count)+ ") " + title + " [ " + date + " @ " + hour + " ]" + "\n")
+        count+=1
         f.close
 
     if message.content.startswith('$showImpDates'):
@@ -132,27 +130,33 @@ async def on_message(message):
         for todo in lines:
             lst+=todo+"\n"
 
-        embed=discord.Embed(title="Important Dates", description="Here is a list of upcoming important dates💼", color=discord.Color.blue())
+        embed=discord.Embed(title="Important Dates", description="Here is a list of upcoming important dates 💼", color=discord.Color.blue())
         embed.add_field(name="List",value=lst,inline=True)
         await message.channel.send(embed=embed)
 
     if message.content.startswith('$clearImpDates'):
         open('ImpDates.txt', 'w').close()
-        await message.channel.send("Important Dates has been cleared✅")
+        await message.channel.send("Important Dates has been cleared ✅")
 
+    if message.content.startswith('$removeImpDates'):
+        userInput = message.content[16:]
+        information = userInput.split(seperator)
+        f = open("ImpDates.txt", "r")
+        lines = f.readlines()
+        f.close
 
-    # if message.content.startswith('$thumb'):
-    #     channel = message.channel
-    #     await channel.send('Send me that "hi" reaction, mate')
+        f2 = open("ImpDates.txt", "w")
+        for line in lines:
+            nLine = line.split(')')
+            print(nLine[0])
+            if(int(nLine[0])!=int(information[0])):
+                f2.write(line)
+            elif(nLine[0][0] == "~"):
+                pass
+            else:
+                line = "~~"+line+"~~"
+                f2.write(line)
 
-    #     def check(string, user):
-    #         return user == message.author and string == "hi"
+        f2.close
 
-    #     # try:
-    #     #     # string, user = await client.wait_for('reaction_add', timeout=60.0, check=check)
-    #     # except asyncio.TimeoutError:
-    #     if check:
-    #         await channel.send('👎')
-    #     else:
-    #         await channel.send('👍')
 client.run(TOKEN)
