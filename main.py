@@ -5,6 +5,7 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 import psycopg2
 
+# MARYAM IS COOl
 # ---------------------------- CONNECTING & CONFIGURATIONS ------------------------
 conn = psycopg2.connect(
 database='whole-mink-215.edubotdb',
