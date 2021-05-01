@@ -3,6 +3,19 @@ import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
+ # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
+import psycopg2
+
+conn = psycopg2.connect(
+database='whole-mink-215.edubotdb',
+user='maryam',
+password= 'Oulnmt4wZqd-bzwR',
+host='free-tier5.gcp-europe-west1.cockroachlabs.cloud',
+port=26257
+)
+conn.set_session(autocommit=True)
+
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
