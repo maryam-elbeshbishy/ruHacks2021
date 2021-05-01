@@ -1,11 +1,13 @@
 import os
 import asyncio
 import discord
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
+bot = commands.Bot(command_prefix='>')
 
 @client.event
 async def on_ready():
@@ -55,10 +57,12 @@ async def on_message(message):
  
         await message.channel.send(acronym)
         await message.channel.send(textbook)
+    
+    if "chick" in message.content:
+        await message.channel.send("hello")
+
 
         
-
-
 
 
     # if message.content.startswith('$thumb'):
