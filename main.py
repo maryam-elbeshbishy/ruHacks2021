@@ -3,10 +3,9 @@ import discord
 import psycopg2
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
-
- # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
 import psycopg2
 
+# ---------------------------- CONNECTING & CONFIGURATIONS ------------------------
 conn = psycopg2.connect(
 database='whole-mink-215.edubotdb',
 user='maryam',
@@ -15,7 +14,6 @@ host='free-tier5.gcp-europe-west1.cockroachlabs.cloud',
 port=26257
 )
 conn.set_session(autocommit=True)
-
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -30,6 +28,7 @@ port=26257
 )
 cur = conn.cursor()
 
+# ---------------------------- DATABASE ------------------------
 def show_dataBase():
     print("\n\n\n\n")
     cur.execute("SELECT * FROM EduBot;")
@@ -47,8 +46,6 @@ def check_code(code):
     if option == []:
         return False
     return True
-
-
 
 @client.event
 async def on_ready():
@@ -126,7 +123,6 @@ async def on_message(message):
             await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
             return
         
-
         cur.execute("""
         UPDATE EduBot
         SET textBook = '{}'
@@ -138,8 +134,7 @@ async def on_message(message):
     if "chick" in message.content:
         await message.channel.send("hello")
 
-    # ---------------------------- RETRIEVING DATA FROM DB----------------------------
-
+    # ---------------------------- GET CLASS TITLE ----------------------------
     if message.content.startswith('$getClassTitle'):
         userInput = message.content[15:]
         information = userInput.split(seperator)
@@ -161,7 +156,7 @@ async def on_message(message):
         else:
             await message.channel.send("ℹ The course title of {} is: {}.".format(acronym,title[0][0]))
 
-
+    # ---------------------------- GET MEETING LINK ----------------------------
     if message.content.startswith('$getClassCode'):
         userInput = message.content[14:]
         information = userInput.split(seperator)
@@ -182,6 +177,8 @@ async def on_message(message):
         else:
             await message.channel.send("ℹ The course code of {} is: {}.".format(title,code[0][0]))
     
+
+    # ---------------------------- GET MEETING LINK ----------------------------
     if message.content.startswith('$getMeetingLink'):
         userInput = message.content[16:]
         information = userInput.split(seperator)
@@ -200,11 +197,13 @@ async def on_message(message):
             await message.channel.send("There is no meeting link for {} 😯".format(acronym))
         else:
             await message.channel.send("🔗 The meeting link for {} is: {}".format(acronym,link[0][0]))
-           
+
+    # ---------------------------- GET TEXTBOOK ----------------------------
     if message.content.startswith('$getTextbook'):
         userInput = message.content[13:]
         information = userInput.split(seperator)
         acronym = information[0].upper().strip()
+
         if not check_code(acronym):
             await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
             return
@@ -220,6 +219,9 @@ async def on_message(message):
         else:
             await message.channel.send("🔗 The textbook link for {} is: {}".format(acronym,text[0][0]))
 
+    # ---------------------------- SCHEDULE ----------------------------
+
+    # ------------- GET SCHEDULE --------------- 
     if message.content.startswith('$getSchedule'):
         lst = ""
         cur.execute("""
@@ -238,6 +240,7 @@ async def on_message(message):
         embed.add_field(name="This Week",value=lst,inline=True)
         await message.channel.send(embed=embed)
 
+    # ------------- CLEAR SCHEDULE --------------- 
     if message.content.startswith('$clearSchedule'):
         cur.execute("""
             DROP TABLE EduBot;
@@ -254,6 +257,7 @@ async def on_message(message):
             timeWeek VARCHAR
             );
         """)
+
     # ---------------------------- TO DO LIST ----------------------------
 
     # ------------- ADD TO DO --------------- 
