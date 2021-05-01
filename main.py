@@ -65,19 +65,30 @@ async def on_message(message):
     if message.content.startswith('$addToDo'):
         userInput = message.content[8:]
         information = userInput.split(seperator)
-        f = open("testFile.txt", "a")
-
+        f = open("toDoList.txt", "a")
+        count = len(open("toDoList.txt").readlines(  )) + 1 # The number is not incrementing, it always prints 1
         for toDo in information:
-            count = len(open("testFile.txt").readlines(  )) + 1 # The number is not incrementing, it always prints 1
             f.write(str(count)+ ") " + toDo + "\n")
-        
+            count+=1
         f.close
 
     if message.content.startswith('$showToDo'):
-        f = open("testFile.txt", "r")
-        await message.channel.send(f.read())
+        lst= ""
+        f = open("toDoList.txt")
+        lines = f.readlines()
+        for todo in lines:
+            lst+=todo+"\n"
 
+        embed=discord.Embed(title="Todo List", description="Here is a list of the things you have to get done 💼", color=discord.Color.blue())
+        embed.add_field(name="List",value=lst,inline=True)
+        # embed.set_author(name="RealDrewData", url="https://twitter.com/RealDrewData", icon_url="https://pbs.twimg.com/profile_images/1327036716226646017/ZuaMDdtm_400x400.jpg")
+        await message.channel.send(embed=embed)
         
+    if message.content.startswith('$clearTodo'):
+        open('toDoList.txt', 'w').close()
+        await message.channel.send("Todo List has been cleared✅")
+
+
 
 
     # if message.content.startswith('$thumb'):
