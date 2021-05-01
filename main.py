@@ -1,5 +1,6 @@
 import os
 import discord
+import psycopg2
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
@@ -7,10 +8,36 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
 
+conn =conn = psycopg2.connect(
+database='whole-mink-215.edubotdb',
+user='maryam',
+password= 'Oulnmt4wZqd-bzwR',
+host='free-tier5.gcp-europe-west1.cockroachlabs.cloud',
+port=26257
+)
+cur = conn.cursor()
+
+def show_dataBase():
+    print("\n\n\n\n")
+    cur.execute("SELECT * FROM EduBot;")
+    table = cur.fetchall()
+    conn.commit()
+    for i in table:
+        print(i)
+
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
-
+    cur.execute( """
+    CREATE TABLE IF NOT EXISTS EduBot (
+    courseCode VARCHAR,
+    courseName VARCHAR,
+    textBook VARCHAR,
+    meetingLink VARCHAR,
+    dayWeek VARCHAR,
+    timeWeek VARCHAR
+    );
+    """)
 
 @client.event
 async def on_message(message):
@@ -23,10 +50,15 @@ async def on_message(message):
     if message.content.startswith('$addClass'):
         userInput = message.content[10:]
         information = userInput.split(seperator)
-        acronym = information[0]
-        title = information[1]
+        acronym = information[0].upper().strip()
+        title = information[1].title().strip()
+        #CHECK IF IN THERE ALREADY
+        cur.execute("""
+        INSERT INTO EduBot VALUES
+        ('{}','{}',NULL,NULL,NULL,NULL);
+        """.format(acronym,title))
         await message.channel.send("The class has been added 🏫")
-
+        show_dataBase()
         await message.channel.send(acronym)
         await message.channel.send(title)
 
@@ -34,11 +66,21 @@ async def on_message(message):
     if message.content.startswith('$addTime_Link'):
         userInput = message.content[14:]
         information = userInput.split(seperator)
-        acronym = information[0]
-        day = information[1]
+        acronym = information[0].strip().upper()
+        day = information[1].strip()
         hour = information[2]
-        link = information[3]
+        link = information[3].strip()
 
+        #CHECK IF IN THERE ALREADY
+
+        cur.execute("""
+        UPDATE EduBot
+        SET meetingLink = '{}', dayWeek = '{}', timeWeek = '{}'
+        WHERE courseCode = '{}';
+        """.format(link,day,hour,acronym))
+        
+
+        show_dataBase()
         await message.channel.send(acronym)
         await message.channel.send(day)
         await message.channel.send(hour)
@@ -50,11 +92,19 @@ async def on_message(message):
     if message.content.startswith('$addTextbook'):
         userInput = message.content[13:]
         information = userInput.split(seperator)
-        acronym = information[0]
-        textbook = information[1]
+        acronym = information[0].upper().strip()
+        textbook = information[1].strip()
+
+        #CHECK IF IN THERE ALREADY
+        
+        cur.execute("""
+        UPDATE EduBot
+        SET textbook = '{}'
+        WHERE courseCode = '{}';
+        """.format(textbook,acronym))
         await message.channel.send("The textbook has been added 📚")
 
- 
+        show_dataBase()
         await message.channel.send(acronym)
         await message.channel.send(textbook)
     
