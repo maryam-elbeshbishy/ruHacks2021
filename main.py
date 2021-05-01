@@ -77,14 +77,15 @@ async def on_message(message):
         information = userInput.split(seperator)
         acronym = information[0].upper().strip()
         title = information[1].title().strip()
-        if check_code(acronym):
-            await message.channel.send("There is already information for '{}' 😯\n Use $addTime_Link or $addTextbook to update it.".format(acronym))
-            return
+        # if check_code(acronym):
+        #     await message.channel.send("There is already information for '{}' 😯\n Use $addTime_Link or $addTextbook to update it.".format(acronym))
+        #     return
         cur.execute("""
         INSERT INTO EduBot VALUES
         ('{}','{}',NULL,NULL,NULL,NULL);
         """.format(acronym,title))
         await message.channel.send("The class has been added 🏫")
+        show_dataBase()
 
     # ---------------------------- ADDING CLASS INFORMATION ----------------------------
     if message.content.startswith('$addTime_Link'):
@@ -238,10 +239,20 @@ async def on_message(message):
 
     if message.content.startswith('$clearSchedule'):
         cur.execute("""
-                TRUNCATE TABLE EduBot;
+            DROP TABLE EduBot;
         """)
+        conn.commit()
         await message.channel.send("Your schedule has been cleared :basket:")
-
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS EduBot (
+            courseCode VARCHAR,
+            courseName VARCHAR,
+            textBook VARCHAR,
+            meetingLink VARCHAR,
+            dayWeek VARCHAR,
+            timeWeek VARCHAR
+            );
+        """)
     # ---------------------------- TO DO LIST ----------------------------
 
     # ------------- ADD TO DO --------------- 
