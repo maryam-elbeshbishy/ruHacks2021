@@ -55,7 +55,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     seperator = ">"
-
+    
     if message.author == client.user:
         return    
 
@@ -195,21 +195,22 @@ async def on_message(message):
             await message.channel.send("🔗 The textbook link for {} is: {}".format(acronym,text[0][0]))
 
     if message.content.startswith('$getSchedule'):
-        userInput = message.content[13:]
-        information = userInput.split(seperator)
-        acronym = information[0].upper().strip()
-        # title = information[1].title().strip()
-        #CHECK IF IN THERE ALREADY
-        # cur.execute("""
-        # INSERT INTO EduBot VALUES
-        # ('{}','{}',NULL,NULL,NULL,NULL);
-        # """.format(acronym,title))
-        # await message.channel.send("The class has been added 🏫")
-        # show_dataBase()
-        # if link[0][0] =="None":
-        #     await message.channel.send("There is course code for {} 😯".format(acronym))
-        # else:
-        await message.channel.send(acronym)
+        lst = ""
+        cur.execute("""
+            SELECT courseCode, courseName, dayWeek, timeWeek FROM EduBot;
+        """)   
+        information = cur.fetchall()
+        conn.commit()
+
+        if len(information) == 0:
+            lst += "There are no classes this week 😯"
+
+        for c in range(len(information)):
+                lst += ("{} {} [ {} @ {}]\n".format(information[c][0], information[c][1], information[c][2], information[c][3]))
+
+        embed=discord.Embed(title="Weekly Schedule", description="Here is your weekly schedule 💼", color=discord.Color.blue())
+        embed.add_field(name="This Week",value=lst,inline=True)
+        await message.channel.send(embed=embed)
 
     # ---------------------------- TO DO LIST ----------------------------
 
