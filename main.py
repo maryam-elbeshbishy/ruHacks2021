@@ -125,7 +125,10 @@ async def on_message(message):
             """.format(acronym))
             title = cur.fetchall()
             conn.commit()
-            await message.channel.send("ℹ The course title of {} is: {}.".format(acronym,title[0][0]))
+            if title[0][0] =="None":
+                await message.channel.send("There is course title for {} 😯".format(acronym))
+            else:
+                await message.channel.send("ℹ The course title of {} is: {}.".format(acronym,title[0][0]))
 
 
     if message.content.startswith('$getClassCode'):
@@ -140,35 +143,43 @@ async def on_message(message):
             """.format(acronym))
             code = cur.fetchall()
             conn.commit()
-            await message.channel.send("ℹ The course code of {} is: {}.".format(title,code[0][0]))
+            if code[0][0] =="None":
+                await message.channel.send("There is course code for {} 😯".format(acronym))
+            else:
+                await message.channel.send("ℹ The course code of {} is: {}.".format(title,code[0][0]))
     
     if message.content.startswith('$getMeetingLink'):
             userInput = message.content[16:]
             information = userInput.split(seperator)
             acronym = information[0].upper().strip()
-        
-            #CHECK IF IN THERE ALREADY
+
             cur.execute("""
                 SELECT meetingLink FROM EduBot 
                 WHERE courseCode = '{}';
             """.format(acronym))
             link = cur.fetchall()
             conn.commit()
-            await message.channel.send("🔗 The meeting link for {} is: {}".format(acronym,link[0][0]))
-            # await message.channel.send(acronym)
-            # await message.channel.send(title)`
+
+            if link[0][0] =="None":
+                await message.channel.send("There is no meeting link for {} 😯".format(acronym))
+            else:
+                await message.channel.send("🔗 The meeting link for {} is: {}".format(acronym,link[0][0]))
+           
     if message.content.startswith('$getTextbook'):
         userInput = message.content[13:]
         information = userInput.split(seperator)
         acronym = information[0].upper().strip()
-        #CHECK IF IN THERE ALREADY
         cur.execute("""
             SELECT textBook FROM EduBot 
             WHERE courseCode = '{}';
         """.format(acronym))
         text = cur.fetchall()
+        print(text)
         conn.commit()
-        await message.channel.send("🔗 The textbook link for {}  is: {}".format(acronym,text[0][0]))
+        if text == []:
+            await message.channel.send("There is no textbook link for {} 😯".format(acronym))
+        else:
+            await message.channel.send("🔗 The textbook link for {} is: {}".format(acronym,text[0][0]))
 
     if message.content.startswith('$getSchedule'):
         userInput = message.content[13:]
@@ -182,6 +193,9 @@ async def on_message(message):
         # """.format(acronym,title))
         # await message.channel.send("The class has been added 🏫")
         # show_dataBase()
+        # if link[0][0] =="None":
+        #     await message.channel.send("There is course code for {} 😯".format(acronym))
+        # else:
         await message.channel.send(acronym)
 
     # ---------------------------- TO DO LIST ----------------------------
