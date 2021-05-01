@@ -106,7 +106,7 @@ async def on_message(message):
             elif(int(nLine[0])!=int(information[0])):
                 f2.write(line)
             else:
-                await message.channel.send("The task has been remove 🧺")
+                await message.channel.send("The task has been removed 🧺")
                 line = "~~"+line+"~~"
                 f2.write(line)
 
