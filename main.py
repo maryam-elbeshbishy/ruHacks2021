@@ -8,8 +8,10 @@ import psycopg2
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from discord.utils import find
 
 import time
+channel_ID = 0
 # ---------------------------- CONNECTING & CONFIGURATIONS ------------------------
 conn = psycopg2.connect(
     database='whole-mink-215.edubotdb',
@@ -113,7 +115,7 @@ async def on_ready():
 
 # ---------------------------- NOTIFICATION TESTING ------------------------
 async def job(acronym, day, hour, link):
-    channel = client.get_channel(837782902066511902)
+    channel = client.get_channel(channel_ID)
     cur.execute("""
         SELECT courseName FROM EduBot
         WHERE courseCode = '{}';
@@ -125,6 +127,11 @@ async def job(acronym, day, hour, link):
     embed.add_field(name="Zoom Link: ", value=link, inline=True)
     await channel.send(embed=embed)
 
+@client.event
+async def on_guild_join(guild):
+    general = find(lambda x: x.name == 'general',  guild.text_channels)
+    if general and general.permissions_for(guild.me).send_messages:
+        await general.send('Hello {}! Glad to be here :grinning: \n\nPlease enter the channel ID with the command $id [channelId] to set the annoucements channel'.format(guild.name))
 
 @client.event
 async def on_message(message):
@@ -133,6 +140,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if message.content.startswith('$id'):
+        userInput = message.content[3:].strip()
+        global channel_ID 
+        channel_ID = userInput
+        
     # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$addClass'):
         userInput = message.content[10:]
@@ -359,6 +371,8 @@ async def on_message(message):
         f.close
         await message.channel.send("The task(s) has been added ⌚")
 
+
+
     # ------------- SHOW TO DO ---------------
     if message.content.startswith('$showToDo'):
         lst = ""
@@ -515,6 +529,6 @@ async def on_message(message):
         embed.add_field(name="$addTime_Link",
                         value="$addTime_Link CourseCode>Day>Time>MeetingLink\nAdd a new meeting link for your lectures, by course code", inline=True)
         await message.channel.send(embed=embed)
-
+        
 scheduler.start()
 client.run(TOKEN)
