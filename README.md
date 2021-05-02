@@ -38,3 +38,14 @@ To authorize the bot into discord:
 ### 2) Important Upcoming Dates
 ### 3) Notification Reminders
 ### 4) To do List
+
+
+## Acknowledgements
+
+This project was created as a submission entry for RU Hacks 2021 Hackathon.
+
+Edubot is built by:
+
+-   [Sholeh Sepehri](https://github.com/SholehSepehri)
+-   [Deandra Spike-Madden](https://github.com/xvxvdee)
+-   [Maryam Elbeshbishy](https://github.com/maryam-elbeshbishy)
