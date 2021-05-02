@@ -5,11 +5,11 @@ from discord.ext import commands, tasks
 from discord.ext.commands import Bot
 from dotenv import load_dotenv
 import psycopg2
-import asyncio
 
-import schedule
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+
 import time
-# MARYAM IS COOl
 # ---------------------------- CONNECTING & CONFIGURATIONS ------------------------
 conn = psycopg2.connect(
 database='whole-mink-215.edubotdb',
@@ -32,6 +32,7 @@ host='free-tier5.gcp-europe-west1.cockroachlabs.cloud',
 port=26257
 )
 cur = conn.cursor()
+scheduler = AsyncIOScheduler()
 
 # ---------------------------- DATABASE ------------------------
 def show_dataBase():
@@ -77,6 +78,7 @@ def time_conversion(time):
 
     print(convertedTime)
 
+
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
@@ -93,37 +95,45 @@ async def on_ready():
 
 
 # ---------------------------- NOTIFICATION TESTING ------------------------
-    async def job():
-        channel = client.get_channel(838199083491524659)
-        await channel.send('hello')
-        
-    schedule.every(10).seconds.do(job)
+async def job():
+    channel = client.get_channel(838199083491524659)
+    await channel.send('hello')
+    
+    # schedule.every(10).seconds.do(job)
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
 
     # channel = client.get_channel(838199083491524659)
     # await channel.send('Hi maryam')
 
+# @client.event
+# async def on_ready():
+#     print("Ready")
 
-def alert():
-   return  "hello world"
+#     #initializing scheduler
 
+#     #sends "s!t" to the channel when time hits 10/20/30/40/50/60 seconds, like 12:04:20 PM
+
+#     #starting the scheduler
+# # def alert():
+# #    return  "hello world"
 
 @client.event
 async def on_message(message):
+
     seperator = ">" 
 
     if message.author == client.user:
         return    
 
     # ---------------------------- NOTIFICATION TESTING ------------------------
-    async def testing(text):
-        print("here")
-        message.channel.send(text)
+    # async def testing(text):
+    #     print("here")
+    #     message.channel.send(text)
     
-    await schedule.every(3).seconds.do(testing(alert))
+    # await schedule.every(3).seconds.do(testing(alert))
 
     # while True:
     #     schedule.run_pending()
@@ -160,6 +170,9 @@ async def on_message(message):
         if not check_code(acronym):
             await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
             return
+
+
+        scheduler.add_job(job, CronTrigger(hour="21",minute="44")) 
 
         cur.execute("""
         UPDATE EduBot
@@ -478,5 +491,5 @@ async def on_message(message):
         embed.add_field(name="$addTime_Link", value="$addTime_Link CourseCode>Day>Time>MeetingLink\nAdd a new meeting link for your lectures, by course code", inline=True)
         await message.channel.send(embed=embed)
 
-    
+scheduler.start()    
 client.run(TOKEN)
