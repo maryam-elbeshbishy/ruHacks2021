@@ -157,6 +157,30 @@ async def on_message(message):
         await message.channel.send("The class has been added 🏫")
         show_dataBase()
 
+    # ---------------------------- REMOVING CLASS TITLE + ACRONYM ----------------------------
+    if message.content.startswith('$removeClass'):
+        userInput = message.content[13:]
+        information = userInput.split(seperator)
+        acronym = information[0].upper().strip()
+        if not check_code(acronym):
+            await message.channel.send("There no information for '{}'. It does NOT exist 😯\n Use $addClass to add it.".format(acronym))
+            return
+
+        try:
+            cur.execute("""
+            DELETE FROM EduBot WHERE courseCode = '{}';
+            """.format(acronym))
+            scheduler.remove_job(acronym)
+            await message.channel.send("The class has been removed :basket:")
+        except:
+            cur.execute("""
+            DELETE FROM EduBot WHERE courseCode = '{}';
+            """.format(acronym))
+            await message.channel.send("The class has been removed :basket:")
+
+
+        # show_dataBase()
+
     # ---------------------------- ADDING CLASS INFORMATION ----------------------------
     if message.content.startswith('$addTime_Link'):
         userInput = message.content[14:]
@@ -305,7 +329,7 @@ async def on_message(message):
         conn.commit()
 
         if len(information) == 0:
-            lst += "There are no classes this week 😯"
+            lst += "There is nothing scheduled this week 😯"
 
         for c in range(len(information)):
             lst += ("{} {} [ {} @ {}]\n".format(information[c][0],
