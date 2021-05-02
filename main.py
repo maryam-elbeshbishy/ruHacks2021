@@ -144,7 +144,7 @@ async def class_notification(acronym, day, hour, link):
 
 # ------------- IMPORTANT DATE NOTIFICAITION ---------------
 async def impDate_notification(title, date, hour):
-    channel = client.get_channel(838199083491524659)
+    channel = client.get_channel(channel_ID)
 
     embed=discord.Embed(title=":alarm_clock: You have {} right now!".format(title), description="{} at {}".format(date,hour), color=0xb0d6ee)
     await channel.send(embed=embed)
