@@ -36,6 +36,8 @@ To authorize the bot into discord:
 
 ### 1) Adding Classes
 ### 2) Important Upcoming Dates
+![image](https://user-images.githubusercontent.com/66393786/116830021-7eb13c80-ab75-11eb-9ff4-88c5862617d1.png)
+
 ### 3) Notification Reminders
 ### 4) To do List
 
