@@ -372,6 +372,8 @@ async def on_message(message):
         f.close
         await message.channel.send("The task(s) has been added ⌚")
 
+
+
     # ------------- SHOW TO DO ---------------
     if message.content.startswith('$showToDo'):
         lst = ""
