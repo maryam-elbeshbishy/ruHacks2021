@@ -42,6 +42,7 @@ https://discord.com/api/oauth2/authorize?client_id=837782902066511902&permission
 ![image](https://user-images.githubusercontent.com/66393786/116830021-7eb13c80-ab75-11eb-9ff4-88c5862617d1.png)
 
 ### 4) To do List
+![image](https://user-images.githubusercontent.com/53820275/116830454-20398d80-ab78-11eb-90cf-45b71c36a7ce.png)
 
 
 ## Acknowledgements
