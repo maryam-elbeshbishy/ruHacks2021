@@ -35,3 +35,6 @@ To authorize the bot into discord:
 ## Application Features
 
 ### 1) Adding Classes
+### 2) Important Upcoming Dates
+### 3) Notification Reminders
+### 4) To do List
