@@ -324,34 +324,27 @@ async def on_message(message):
             await message.channel.send("🩹 **Please use the command as so: $getClassTitle CODE**\nFor more information use $help")
 
 
-    # ---------------------------- GET CLASSCODE ---------------------------- ADLSKJDALSDJALKSDJA
+    # ---------------------------- GET CLASSCODE ---------------------------- 
     if message.content.startswith('$getClassCode'):   
         try:
             userInput = message.content[14:]
             information = userInput.split(seperator)
-            check = information[0].strip()
-            print(check)
+            check = information[0].title().strip()
             if len(str(check))==0:
                 await message.channel.send("🩹 **Please use the command as so: $getClassCode TITLE**\nFor more information use $help")
-                print("here2")
                 return
             cur.execute("""
                 SELECT courseCode FROM EduBot 
                 WHERE courseName = '{}';
             """.format(check))
             code = cur.fetchall()
-            print(code[0][0])
-            conn.commit()
 
-            print("here4")
-            print(code,"----")
-            if code == []:
+            if len(code) == 0:
                 await message.channel.send("There no is course code for {} 😯".format(check))
-            else:
-                await message.channel.send("ℹ The course code of {} is: {}.".format(title, code[0][0]))
-            print("ding")
+                return
+           
+            await message.channel.send("ℹ The course code of {} is: {}.".format(check, code[0][0]))
         except:
-            print("here3")
             await message.channel.send("🩹 **Please use the command as so: $getClassCode TITLE**\nFor more information use $help")
 
 
