@@ -460,24 +460,31 @@ async def on_message(message):
 
     # ------------- ADD DATE ---------------
     if message.content.startswith('$addImpDates'):
-        userInput = message.content[13:]
-        information = userInput.split(seperator)
-        title = information[0]
-        date = information[1]
-        hour = information[2]
+        try:
+            userInput = message.content[13:]
+            information = userInput.split(seperator)
+            title = information[0]
+            date = information[1]
+            hour = information[2]
 
-        conv_date = date_conversion(date)
-        conv_hour = time_conversion(hour)
+            conv_date = date_conversion(date)
+            conv_hour = time_conversion(hour)
+     
+            scheduler.add_job(impDate_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], month=conv_date[0], day=conv_date[1], year=conv_date[2]), args=(title, date, hour))
 
-        scheduler.add_job(impDate_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], month=conv_date[0], day=conv_date[1], year=conv_date[2]), args=(title, date, hour))
+            if len(title)==0 or len(date)==0 or len(hour)==0:
+                await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
+                return
 
-        f = open("ImpDates.txt", "a")
-        count = len(open("ImpDates.txt").readlines()) + 1
-        f.write(str(count) + ") " + title +
-                " [ " + date + " @ " + hour + " ]" + "\n")
-        count += 1
-        f.close
-        await message.channel.send("The important date has been added ⌚")
+            f = open("ImpDates.txt", "a")
+            count = len(open("ImpDates.txt").readlines()) + 1
+            f.write(str(count) + ") " + title +
+                    " [ " + date + " @ " + hour + " ]" + "\n")
+            count += 1
+            f.close
+            await message.channel.send("The important date has been added ⌚")
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
 
 
     # ------------- SHOW DATE ---------------
