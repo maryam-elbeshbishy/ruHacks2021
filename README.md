@@ -39,6 +39,7 @@ https://discord.com/api/oauth2/authorize?client_id=837782902066511902&permission
 ![image](https://user-images.githubusercontent.com/53820275/116830866-47915a00-ab7a-11eb-97b4-90304143b34f.png)
 
 ### 2) Important Upcoming Dates
+![image](https://user-images.githubusercontent.com/53820275/116830886-61cb3800-ab7a-11eb-94ff-f9c093f962e0.png)
 
 ### 3) Notification Reminders
 ![image](https://user-images.githubusercontent.com/66393786/116830021-7eb13c80-ab75-11eb-9ff4-88c5862617d1.png)
