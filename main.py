@@ -126,8 +126,10 @@ async def on_ready():
     );
     """)
 
-# ---------------------------- NOTIFICATION TESTING ------------------------
-async def job(acronym, day, hour, link):
+# ---------------------------- NOTIFICATION ALERTS------------------------
+
+# ------------- CLASS NOTIFICATION -------------------
+async def class_notification(acronym, day, hour, link):
     channel = client.get_channel(channel_ID)
     cur.execute("""
         SELECT courseName FROM EduBot
@@ -138,6 +140,13 @@ async def job(acronym, day, hour, link):
 
     embed=discord.Embed(title=":alarm_clock: You have {} right now!".format(title[0][0]), description="{} takes place on {} at {}".format(acronym,day.title(),hour), color=0xb0d6ee)
     embed.add_field(name="Zoom Link: ", value=link, inline=True)
+    await channel.send(embed=embed)
+
+# ------------- IMPORTANT DATE NOTIFICAITION ---------------
+async def impDate_notification(title, date, hour):
+    channel = client.get_channel(838199083491524659)
+
+    embed=discord.Embed(title=":alarm_clock: You have {} right now!".format(title), description="{} at {}".format(date,hour), color=0xb0d6ee)
     await channel.send(embed=embed)
 
 @client.event
@@ -172,6 +181,7 @@ async def on_message(message):
             INSERT INTO EduBot VALUES
             ('{}','{}',NULL,NULL,NULL,NULL);
             """.format(acronym, title))
+            
             await message.channel.send("The class has been added 🏫")
             show_dataBase()
         except:
@@ -248,7 +258,7 @@ async def on_message(message):
                 print("here3")
                 return
 
-            scheduler.add_job(job, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], day_of_week=conv_day), id=acronym, args=(acronym, day, hour, link))
+            scheduler.add_job(class_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], day_of_week=conv_day), id=acronym, args=(acronym, day, hour, link))
 
             cur.execute("""
             UPDATE EduBot
@@ -540,14 +550,11 @@ async def on_message(message):
             conv_date = date_conversion(date)
             conv_hour = time_conversion(hour)
      
+            scheduler.add_job(impDate_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], month=conv_date[0], day=conv_date[1], year=conv_date[2]), args=(title, date, hour))
 
             if len(title)==0 or len(dateInput)==0:
                 await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
                 return
-
-            dateInfo = dateInput.split(" ")
-            date = dateInfo[0]
-            hour = dateInfo[1]
 
             f = open("ImpDates.txt", "a")
             count = len(open("ImpDates.txt").readlines()) + 1
@@ -557,7 +564,7 @@ async def on_message(message):
             f.close
             await message.channel.send("The important date has been added ⌚")
         except:
-            
+            await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
 
 
     # ------------- SHOW DATE ---------------
