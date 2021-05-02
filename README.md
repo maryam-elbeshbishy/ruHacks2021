@@ -25,9 +25,8 @@ To authorize the bot into discord:
 
 ## Introduction
 
-**EduBot** is a discord bot that was designed to help students in staying organized during the school year. Edu
-Keep track of your schedule and notify you of class 
-and important date times! 
+**EduBot** is a discord bot that was designed to help students in staying organized during the school year. Edubot helps users keep track of their weekly school schedule and notifies student of class and imrpotant date times. Edubot has additional features to help users stay organized, such as a To Do List, where users can cross out the tasks they have completed.
+
 
 ## Application Features
 
