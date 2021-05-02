@@ -2,8 +2,10 @@ import os
 import discord
 import psycopg2
 from discord.ext import commands, tasks
+from discord.ext.commands import Bot
 from dotenv import load_dotenv
 import psycopg2
+import asyncio
 
 import schedule
 import time
@@ -89,6 +91,22 @@ async def on_ready():
     );
     """)
 
+
+# ---------------------------- NOTIFICATION TESTING ------------------------
+    async def job():
+        channel = client.get_channel(838199083491524659)
+        await channel.send('hello')
+        
+    schedule.every(10).seconds.do(job)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+    # channel = client.get_channel(838199083491524659)
+    # await channel.send('Hi maryam')
+
+
 def alert():
    return  "hello world"
 
@@ -100,15 +118,17 @@ async def on_message(message):
     if message.author == client.user:
         return    
 
+    # ---------------------------- NOTIFICATION TESTING ------------------------
     async def testing(text):
         print("here")
         message.channel.send(text)
     
     await schedule.every(3).seconds.do(testing(alert))
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
+
 
     # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$addClass'):
