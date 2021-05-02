@@ -5,6 +5,9 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 import psycopg2
 
+import schedule
+import time
+# MARYAM IS COOl
 # ---------------------------- CONNECTING & CONFIGURATIONS ------------------------
 conn = psycopg2.connect(
 database='whole-mink-215.edubotdb',
@@ -86,12 +89,26 @@ async def on_ready():
     );
     """)
 
+def alert():
+   return  "hello world"
+
+
 @client.event
 async def on_message(message):
-    seperator = ">"
-    
+    seperator = ">" 
+
     if message.author == client.user:
         return    
+
+    async def testing(text):
+        print("here")
+        message.channel.send(text)
+    
+    await schedule.every(3).seconds.do(testing(alert))
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
     # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$addClass'):
@@ -108,6 +125,8 @@ async def on_message(message):
         """.format(acronym,title))
         await message.channel.send("The class has been added 🏫")
         show_dataBase()
+
+
 
     # ---------------------------- ADDING CLASS INFORMATION ----------------------------
     if message.content.startswith('$addTime_Link'):
@@ -439,4 +458,5 @@ async def on_message(message):
         embed.add_field(name="$addTime_Link", value="$addTime_Link CourseCode>Day>Time>MeetingLink\nAdd a new meeting link for your lectures, by course code", inline=True)
         await message.channel.send(embed=embed)
 
+    
 client.run(TOKEN)
