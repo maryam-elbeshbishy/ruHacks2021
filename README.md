@@ -36,6 +36,8 @@ https://discord.com/api/oauth2/authorize?client_id=837782902066511902&permission
 ## Application Features
 
 ### 1) Adding Classes
+![image](https://user-images.githubusercontent.com/53820275/116830866-47915a00-ab7a-11eb-97b4-90304143b34f.png)
+
 ### 2) Important Upcoming Dates
 
 ### 3) Notification Reminders
