@@ -651,30 +651,32 @@ async def on_message(message):
 
     # ---------------------------- HELP COMMAND ----------------------------
     if message.content.startswith('$help'):
-        embed = discord.Embed(
-            title="Commands", description="Here's a list of the commands and how to use them!", color=0x78c6dd)
-        embed.add_field(
-            name="$addClass", value="$addClass CourseCode>CourseName\nAdd a class to your schedule", inline=False)
-        embed.add_field(
-            name="$addTextbook", value="$addTextbook TextbookName\nAdd a textbook link to stay organized", inline=False)
-        embed.add_field(
-            name="$addToDo", value="$addToDo Task\nAdd a task to your to do list", inline=False)
-        embed.add_field(
-            name="$addImpDates", value="$addImpDates Date>Time>Name\nSave important assignments and dates to be notified", inline=False)
-        embed.add_field(
-            name="$removeToDo", value="$removeToDo Task\nCross out a task once youre done", inline=False)
-        embed.add_field(name="$removeImpDates",
-                        value="$remove Date>Time>Name\nRemove an important date once it is over", inline=False)
-        embed.add_field(name="$showToDo",
-                        value="Lists your to do list", inline=False)
-        embed.add_field(name="$showImpDate",
-                        value="Lists your important dates", inline=False)
-        embed.add_field(name="$clearToDo",
-                        value="Clears all items off to do list", inline=False)
-        embed.add_field(name="$clearImpDates",
-                        value="Clears all items off important dates list", inline=False)
-        embed.add_field(name="$addTime_Link",
-                        value="$addTime_Link CourseCode>Day>Time>MeetingLink\nAdd a new meeting link for your lectures, by course code", inline=True)
+        embed = discord.Embed(title=":sos:  COMMANDS", description="Here's a list of the commands and how to use them!", color=0x78c6dd)
+        
+        embed.add_field(name=":green_circle: ADDING", value="- - - - - - - - -", inline=False)
+        embed.add_field(name="$addClass", value="$addClass CourseCode>CourseName\nAdd a class to your schedule", inline=False)
+        embed.add_field(name="$addTime_Link", value="$addTime_Link CourseCode>Day>Time>MeetingLink\nDay: Monday/Tuesday/Wednesday/Thursday/Saturday/Sunday\n Time: hh:mm AM/PM\nAdd a time & meeting link for your lectures, by course code", inline=True)
+        embed.add_field(name="$addTextbook", value="$addTextbook CourseCode>TextbookLink\nAdd a textbook link to stay organized", inline=False)
+        embed.add_field(name="$addToDo", value="$addToDo Task\nAdd a task to your to do list", inline=False)
+        embed.add_field(name="$addImpDates", value="$addImpDates Title>Date>Time\nDate: mm/dd/yyyy\n Time: hh:mm AM/PM\nSave important assignments and dates to be notified", inline=False)
+
+        embed.add_field(name=":red_circle: REMOVING", value="- - - - - - - - - - - -", inline=False)
+        embed.add_field(name="$removeClass", value="$removeClass CourseCode\nRemove a class to your schedule", inline=False)
+        embed.add_field(name="$removeToDo", value="$removeToDo Task\nCross out a task once youre done", inline=False)
+        embed.add_field(name="$removeImpDates", value="$remove Date>Time>Name\nRemove an important date once it is over", inline=False)
+        embed.add_field(name="$clearToDo",value="Clears all items off to do list", inline=False)
+        embed.add_field(name="$clearImpDates",value="Clears all items off important dates list", inline=False) 
+        embed.add_field(name="$clearSchedule",value="Clears all items off your weekly schedule", inline=False) 
+
+        embed.add_field(name=":yellow_circle: RETRIEVING", value="- - - - - - - - - - - -", inline=False)
+        embed.add_field(name="$getSchedule", value="$getSchedule CourseCode\nGet your weekly schedule of your courses", inline=False)
+        embed.add_field(name="$getClassTitle", value="$getClassTitle CourseCode\nGet the class title of a course", inline=False)
+        embed.add_field(name="$getClassCode", value="$getClassCode CourseName\nGet the class title of a course", inline=False)
+        embed.add_field(name="$gettextbook", value="$getTextbook CourseCode\nGet the textbook link of a course", inline=False)
+        embed.add_field(name="$getMeetingLink", value="$getMeetingLink CourseCode\nGet the meeting link of a course", inline=False)
+        embed.add_field(name="$showToDo", value="Lists your to do list", inline=False)
+        embed.add_field(name="$showImpDate",value="Lists your important dates", inline=False)
+
         await message.channel.send(embed=embed)
         
 scheduler.start()
