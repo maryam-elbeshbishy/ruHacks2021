@@ -64,22 +64,27 @@ async def on_ready():
     );
     """)
 
+def alert():
+   return  "hello world"
+
+
 @client.event
 async def on_message(message):
-    seperator = ">"
-    
+    seperator = ">" 
 
     if message.author == client.user:
         return    
 
-    async def alert():
-        await message.channel.send("hello world")
+    async def testing(text):
+        print("here")
+        message.channel.send(text)
+    
+    await schedule.every(3).seconds.do(testing(alert))
 
-    # schedule.every(3).seconds.do(alert)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(1)
     # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$addClass'):
         userInput = message.content[10:]
@@ -428,10 +433,5 @@ async def on_message(message):
         embed.add_field(name="$addTime_Link", value="$addTime_Link CourseCode>Day>Time>MeetingLink\nAdd a new meeting link for your lectures, by course code", inline=True)
         await message.channel.send(embed=embed)
 
-schedule.every(3).seconds.do(alert)
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
     
 client.run(TOKEN)
