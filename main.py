@@ -5,7 +5,6 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 import psycopg2
 
-# MARYAM IS COOl
 # ---------------------------- CONNECTING & CONFIGURATIONS ------------------------
 conn = psycopg2.connect(
 database='whole-mink-215.edubotdb',
@@ -47,6 +46,31 @@ def check_code(code):
     if option == []:
         return False
     return True
+
+# ---------------------------- 24 HOUR TIME CONVERSION ------------------------
+def time_conversion(time):
+    timeSplit = time.split(":")
+    minuteSplit = timeSplit[1].split(" ")
+
+    # Case 1: Time is in PM
+    if time[len(time) - 2::].upper() == "PM":
+      if int(timeSplit[0]) == 12:
+        convertedTime = timeSplit[0] + ":" + minuteSplit[0]
+      else:
+        hour = int(timeSplit[0]) + 12
+        convertedTime = str(hour) + ":" + minuteSplit[0]
+
+    # Case 2: Time is in AM 
+    if time[len(time) - 2::].upper() == "AM":
+      if int(timeSplit[0]) == 12:
+        convertedTime = "00" + ":" + minuteSplit[0]
+      else:
+        if len(timeSplit[0]) == 1:
+          convertedTime = "0" + timeSplit[0] + ":" + minuteSplit[0]
+        else:
+          convertedTime = timeSplit[0] + ":" + minuteSplit[0]
+
+    print(convertedTime)
 
 @client.event
 async def on_ready():
