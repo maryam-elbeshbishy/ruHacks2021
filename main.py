@@ -238,7 +238,7 @@ async def on_message(message):
 
             conv_hour = time_conversion(hour)
             conv_day = day_conversion(day)
-            print(len(acronym),len(day),len(hour),len(link))
+            
             if len(acronym)==0 or len(day)==0 or len(hour)==0 or len(link)==0:
                 await message.channel.send("🩹 **Please use the command as so: $addTime_Link CODE>DAY>TIME>MEETINGLINK**\n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nFor more information use $help")
                 return
