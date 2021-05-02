@@ -5,7 +5,7 @@ from discord.ext import commands, tasks
 from discord.ext.commands import Bot
 from dotenv import load_dotenv
 import psycopg2
-
+import re
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from discord.utils import find
@@ -147,174 +147,243 @@ async def on_message(message):
         
     # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$addClass'):
-        userInput = message.content[10:]
-        information = userInput.split(seperator)
-        acronym = information[0].upper().strip()
-        title = information[1].title().strip()
-        # if check_code(acronym):
-        #     await message.channel.send("There is already information for '{}' 😯\n Use $addTime_Link or $addTextbook to update it.".format(acronym))
-        #     return
-        cur.execute("""
-        INSERT INTO EduBot VALUES
-        ('{}','{}',NULL,NULL,NULL,NULL);
-        """.format(acronym, title))
-        await message.channel.send("The class has been added 🏫")
-        show_dataBase()
+        try:
+            userInput = message.content[10:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
+            title = information[1].title().strip()
+            if len(acronym)==0 or len(title)==0:
+                await message.channel.send("🩹 **Please use the command as so: $addClass CODE>TITLE**\nFor more information use $help")
+                return
+            cur.execute("""
+            INSERT INTO EduBot VALUES
+            ('{}','{}',NULL,NULL,NULL,NULL);
+            """.format(acronym, title))
+            await message.channel.send("The class has been added 🏫")
+            show_dataBase()
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $addClass CODE>TITLE**\nFor more information use $help")
+
 
     # ---------------------------- REMOVING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$removeClass'):
-        userInput = message.content[13:]
-        information = userInput.split(seperator)
-        acronym = information[0].upper().strip()
-        if not check_code(acronym):
-            await message.channel.send("There no information for '{}'. It does NOT exist 😯\n Use $addClass to add it.".format(acronym))
-            return
-
         try:
-            cur.execute("""
-            DELETE FROM EduBot WHERE courseCode = '{}';
-            """.format(acronym))
-            scheduler.remove_job(acronym)
-            await message.channel.send("The class has been removed :basket:")
+            userInput = message.content[13:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
+            if len(acronym)==0:
+                await message.channel.send("🩹 **Please use the command as so: $removeClass CODE**\nFor more information use $help")
+                return
+            if not check_code(acronym):
+                await message.channel.send("There no information for '{}'. It does NOT exist 😯\n Use $addClass to add it.".format(acronym))
+                return
+
+            try:
+                cur.execute("""
+                DELETE FROM EduBot WHERE courseCode = '{}';
+                """.format(acronym))
+                scheduler.remove_job(acronym)
+                await message.channel.send("The class has been removed :basket:")
+            except:
+                cur.execute("""
+                DELETE FROM EduBot WHERE courseCode = '{}';
+                """.format(acronym))
+                await message.channel.send("The class has been removed :basket:")
         except:
-            cur.execute("""
-            DELETE FROM EduBot WHERE courseCode = '{}';
-            """.format(acronym))
-            await message.channel.send("The class has been removed :basket:")
+            await message.channel.send("🩹 **Please use the command as so: $removeClass CODE**\nFor more information use $help")
+
 
 
         # show_dataBase()
 
     # ---------------------------- ADDING CLASS INFORMATION ----------------------------
     if message.content.startswith('$addTime_Link'):
-        userInput = message.content[14:]
-        information = userInput.split(seperator)
-        acronym = information[0].strip().upper()
-        day = information[1].strip()
-        hour = information[2]
-        link = information[3].strip()
-        conv_hour = time_conversion(hour)
-        print(conv_hour)
-        conv_day = day_conversion(day)
+        
+        try:
+            userInput = message.content[14:]
+            information = userInput.split(seperator)
+            acronym = information[0].strip().upper()
+            day = information[1].strip()
+            hour = information[2]
+            link = information[3].strip()
 
-        if not check_code(acronym):
-            await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
-            return
+            patterns =["((1[0-2])|[1-9]):[0-5][0-9] (A|P)M","((m|M)on|(t|T)ues|(w|W)ednes|(T|t)hurs|(f|F)ri)day"]
+    
+            res1 = re.match(patterns[0],hour)
+            res2 = re.match(patterns[1],day)
 
-        scheduler.add_job(job, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], day_of_week=conv_day), id=acronym, args=(acronym, day, hour, link))
 
-        cur.execute("""
-        UPDATE EduBot
-        SET meetingLink = '{}', dayWeek = '{}', timeWeek = '{}'
-        WHERE courseCode = '{}';
-        """.format(link, day, hour, acronym))
+            conv_hour = time_conversion(hour)
+            conv_day = day_conversion(day)
 
-        await message.channel.send("The class information has been added 🏫")
+            if len(acronym)==0 or len(day)==0 or len(hour)==0 or len(link)==0:
+                await message.channel.send("🩹 **Please use the command as so: $addTime_Link CODE>DAY>TIME>MEETINGLINK**\n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nFor more information use $help")
+                print("here1")
+                return
+
+            if not res2: 
+                await message.channel.send("🩹 **Please input a valid day and try again. Ex.(Monday)**")
+                print("here day")
+                return
+            if not res1:
+                await message.channel.send("🩹 **Please input a valid time and try again.**")
+                print("here2")
+                return
+
+            if not check_code(acronym):
+                await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
+                print("here3")
+                return
+
+            scheduler.add_job(job, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], day_of_week=conv_day), id=acronym, args=(acronym, day, hour, link))
+
+            cur.execute("""
+            UPDATE EduBot
+            SET meetingLink = '{}', dayWeek = '{}', timeWeek = '{}'
+            WHERE courseCode = '{}';
+            """.format(link, day, hour, acronym))
+
+            await message.channel.send("The class information has been added 🏫")
+        except:
+            print("here4")
+            await message.channel.send("🩹 **Please use the command as so: $addTime_Link CODE>DAY>TIME>MEETINGLINK**\n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nFor more information use $help")
 
     # ---------------------------- ADD TEXTBOOK ----------------------------
     if message.content.startswith('$addTextbook'):
-        userInput = message.content[13:]
-        information = userInput.split(seperator)
-        acronym = information[0].upper().strip()
-        textbook = information[1].strip()
+        try:
+            userInput = message.content[13:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
+            textbook = information[1].strip()
+            if len(acronym)==0 or len(textbook)==0:
+                await message.channel.send("🩹 **Please use the command as so: $addTextbook CODE>TEXTBOOK LINK**\nFor more information use $help")
+                return
 
-        if not check_code(acronym):
-            await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
-            return
+            if not check_code(acronym):
+                await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
+                return
 
-        cur.execute("""
-        UPDATE EduBot
-        SET textBook = '{}'
-        WHERE courseCode = '{}';
-        """.format(textbook, acronym))
-        await message.channel.send("The textbook has been added 📚")
+            cur.execute("""
+            UPDATE EduBot
+            SET textBook = '{}'
+            WHERE courseCode = '{}';
+            """.format(textbook, acronym))
+            await message.channel.send("The textbook has been added 📚")
 
-    if "chick" in message.content:
-        await message.channel.send("hello")
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $addTextbook CODE>TEXTBOOK LINK**\nFor more information use $help")
+
+
 
     # ---------------------------- GET CLASS TITLE ----------------------------
     if message.content.startswith('$getClassTitle'):
-        userInput = message.content[15:]
-        information = userInput.split(seperator)
-        acronym = information[0].upper().strip()
+        try: 
+            userInput = message.content[15:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
 
-        if not check_code(acronym):
-            await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
-            return
+            if len(acronym)==0:
+                await message.channel.send("🩹 **Please use the command as so: $getClassTitle CODE**\nFor more information use $help")
+                return
+            if not check_code(acronym):
+                await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
+                return
 
-        cur.execute("""
-            SELECT courseName FROM EduBot 
-            WHERE courseCode = '{}';
-        """.format(acronym))
-        title = cur.fetchall()
-        conn.commit()
 
-        if title[0][0] == None:
-            await message.channel.send("There no is course title for {} 😯".format(acronym))
-        else:
-            await message.channel.send("ℹ The course title of {} is: {}.".format(acronym, title[0][0]))
+            cur.execute("""
+                SELECT courseName FROM EduBot 
+                WHERE courseCode = '{}';
+            """.format(acronym))
+            title = cur.fetchall()
+            conn.commit()
 
-    # ---------------------------- GET MEETING LINK ----------------------------
-    if message.content.startswith('$getClassCode'):
-        userInput = message.content[14:]
-        information = userInput.split(seperator)
-        acronym = information[0].upper().strip()
+            if title[0][0] == None:
+                    await message.channel.send("There no is Class title for {} 😯".format(acronym))
+            else:
+                await message.channel.send("ℹ The class title of {} is: {}.".format(acronym, title[0][0]))
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $getClassTitle CODE**\nFor more information use $help")
 
-        if not check_code(acronym):
-            await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
-            return
 
-        cur.execute("""
-            SELECT courseCode FROM EduBot 
-            WHERE courseName = '{}';
-        """.format(acronym))
-        code = cur.fetchall()
-        conn.commit()
-        if code[0][0] == None:
-            await message.channel.send("There no is course code for {} 😯".format(acronym))
-        else:
-            await message.channel.send("ℹ The course code of {} is: {}.".format(title, code[0][0]))
+    # ---------------------------- GET MEETING LINK ---------------------------- ADLSKJDALSDJALKSDJA
+    if message.content.startswith('$getClassCode'):   
+        try:
+            userInput = message.content[14:]
+            information = userInput.split(seperator)
+            check = information[0].strip()
+
+            if len(check)==0:
+                await message.channel.send("🩹 **Please use the command as so: $getClassCode TITLE**\nFor more information use $help")
+                return
+        
+            cur.execute("""
+                SELECT courseCode FROM EduBot 
+                WHERE courseName = '{}';
+            """.format(check))
+            code = cur.fetchall()
+            conn.commit()
+            if code[0][0] == None:
+                await message.channel.send("There no is course code for {} 😯".format(check))
+            else:
+                await message.channel.send("ℹ The course code of {} is: {}.".format(title, code[0][0]))
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $getClassCode TITLE**\nFor more information use $help")
+
 
     # ---------------------------- GET MEETING LINK ----------------------------
     if message.content.startswith('$getMeetingLink'):
-        userInput = message.content[16:]
-        information = userInput.split(seperator)
-        acronym = information[0].upper().strip()
-        if not check_code(acronym):
-            await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
-            return
-        cur.execute("""
-            SELECT meetingLink FROM EduBot 
-            WHERE courseCode = '{}';
-        """.format(acronym))
-        link = cur.fetchall()
-        conn.commit()
+        try:
+            userInput = message.content[16:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
+            if len(acronym)==0:
+                        await message.channel.send("🩹 **Please use the command as so: $getMeetingLink CODE**\nFor more information use $help")
+                        return
+            if not check_code(acronym):
+                await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
+                return
+            cur.execute("""
+                SELECT meetingLink FROM EduBot 
+                WHERE courseCode = '{}';
+            """.format(acronym))
+            link = cur.fetchall()
+            conn.commit()
 
-        if link[0][0] == None:
-            await message.channel.send("There is no meeting link for {} 😯".format(acronym))
-        else:
-            await message.channel.send("🔗 The meeting link for {} is: {}".format(acronym, link[0][0]))
+            if link[0][0] == None:
+                await message.channel.send("There is no meeting link for {} 😯".format(acronym))
+            else:
+                await message.channel.send("🔗 The meeting link for {} is: {}".format(acronym, link[0][0]))
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $getMeetingLink CODE**\nFor more information use $help")
+
 
     # ---------------------------- GET TEXTBOOK ----------------------------
     if message.content.startswith('$getTextbook'):
-        userInput = message.content[13:]
-        information = userInput.split(seperator)
-        acronym = information[0].upper().strip()
+        try:
+            userInput = message.content[13:]
+            information = userInput.split(seperator)
+            acronym = information[0].upper().strip()
 
-        if not check_code(acronym):
-            await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
-            return
+            if len(acronym)==0:
+                    await message.channel.send("🩹 **Please use the command as so: $getTextbook CODE**\nFor more information use $help")
+                    return
 
-        cur.execute("""
-            SELECT textBook FROM EduBot 
-            WHERE courseCode = '{}';
-        """.format(acronym))
-        text = cur.fetchall()
-        conn.commit()
-        if text[0][0] == None:
-            await message.channel.send("There is no textbook link for {} 😯".format(acronym))
-        else:
-            await message.channel.send("🔗 The textbook link for {} is: {}".format(acronym, text[0][0]))
+            if not check_code(acronym):
+                await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
+                return
+
+            cur.execute("""
+                SELECT textBook FROM EduBot 
+                WHERE courseCode = '{}';
+            """.format(acronym))
+            text = cur.fetchall()
+            conn.commit()
+            if text[0][0] == None:
+                await message.channel.send("There is no textbook link for {} 😯".format(acronym))
+            else:
+                await message.channel.send("🔗 The textbook link for {} is: {}".format(acronym, text[0][0]))
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $getTextbook CODE**\nFor more information use $help")
 
     # ---------------------------- SCHEDULE ----------------------------
 
@@ -361,16 +430,22 @@ async def on_message(message):
 
     # ------------- ADD TO DO ---------------
     if message.content.startswith('$addToDo'):
-        userInput = message.content[9:]
-        information = userInput.split(seperator)
-        f = open("toDoList.txt", "a")
-        count = len(open("toDoList.txt").readlines()) + 1
-        for toDo in information:
-            f.write(str(count) + ") " + toDo + "\n")
-            count += 1
-        f.close
-        await message.channel.send("The task(s) has been added ⌚")
-
+        try:
+            userInput = message.content[9:]
+            information = userInput.split(seperator)
+            print(information)
+            if len(information[0])==0:
+                await message.channel.send("🩹 **Please use the command as so: $addToDo** *Task you want to complete...*\nFor more information use $help")
+                return
+            f = open("toDoList.txt", "a")
+            count = len(open("toDoList.txt").readlines()) + 1
+            for toDo in information:
+                f.write(str(count) + ") " + toDo + "\n")
+                count += 1
+            f.close
+            await message.channel.send("The task(s) has been added ⌚")
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $addToDo** *Task you want to complete...*\nFor more information use $help")
 
 
     # ------------- SHOW TO DO ---------------
@@ -399,31 +474,42 @@ async def on_message(message):
 
     # ------------- REMOVE TO DO ---------------
     if message.content.startswith('$removeToDo'):
-        userInput = message.content[11:]
-        information = userInput.split(seperator)
-        f = open("toDoList.txt", "r")
-        lines = f.readlines()
-        f.close
+        try:
+            userInput = message.content[11:]
+            information = userInput.split(seperator)
+            if len(information[0])==0:
+                await message.channel.send("🩹 **Please use the command as so: $removeToDo TASK NUMBER** \nFor more information use $help")
+                return
+            f = open("toDoList.txt", "r")
+            lines = f.readlines()
+            f.close
 
-        f2 = open("toDoList.txt", "w")
-        for line in lines:
-            nLine = line.split(')')
+            if int(information[0])>len(lines):
+                await message.channel.send("🩹 **Please enter a valid task number.**")
+                return
 
-            if(str(nLine[0][0]) == "~" or str(nLine[0][0]) == ""):
-                f2.write(line)
-            elif(int(nLine[0]) != int(information[0])):
-                f2.write(line)
+            f2 = open("toDoList.txt", "w")
+            for line in lines:
+                nLine = line.split(')')
 
-            else:
-                await message.channel.send("The task has been removed :basket:")
-                line = "~~"+line+"~~\n"
-                f2.write(line)
+                if(str(nLine[0][0]) == "~" or str(nLine[0][0]) == ""):
+                    f2.write(line)
+                elif(int(nLine[0]) != int(information[0])):
+                    f2.write(line)
 
-        f2.close
+                else:
+                    await message.channel.send("The task has been removed :basket:")
+                    line = "~~"+line+"~~\n"
+                    f2.write(line)
+
+            f2.close
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $removeToDo TASK NUMBER** \nFor more information use $help")
+
 
     # ------------- CLEAR TO DO ---------------
     if message.content.startswith('$clearToDo'):
-        print("REACHED")
+        # print("REACHED")
         open('toDoList.txt', 'w').close()
         await message.channel.send("Todo List has been cleared✅")
 
@@ -431,22 +517,31 @@ async def on_message(message):
 
     # ------------- ADD DATE ---------------
     if message.content.startswith('$addImpDates'):
-        userInput = message.content[13:]
-        information = userInput.split(seperator)
-        title = information[0]
-        dateInput = information[1]
+        try:
+            userInput = message.content[13:]
+            information = userInput.split(seperator)
+            title = information[0]
+            dateInput = information[1]
 
-        dateInfo = dateInput.split(" ")
-        date = dateInfo[0]
-        hour = dateInfo[1]
+            if len(title)==0 or len(dateInput)==0:
+                await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
+                return
 
-        f = open("ImpDates.txt", "a")
-        count = len(open("ImpDates.txt").readlines()) + 1
-        f.write(str(count) + ") " + title +
-                " [ " + date + " @ " + hour + " ]" + "\n")
-        count += 1
-        f.close
-        await message.channel.send("The important date has been added ⌚")
+            dateInfo = dateInput.split(" ")
+            date = dateInfo[0]
+            hour = dateInfo[1]
+
+            f = open("ImpDates.txt", "a")
+            count = len(open("ImpDates.txt").readlines()) + 1
+            f.write(str(count) + ") " + title +
+                    " [ " + date + " @ " + hour + " ]" + "\n")
+            count += 1
+            f.close
+            await message.channel.send("The important date has been added ⌚")
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
+
+
 
     # ------------- SHOW DATE ---------------
     if message.content.startswith('$showImpDates'):
