@@ -541,8 +541,8 @@ async def on_message(message):
             conv_hour = time_conversion(hour)
      
 
-            if len(title)==0 or len(dateInput)==0:
-                await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
+            if len(title)==0 or len(date)==0 or len(hour)==0:
+                await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
                 return
 
             dateInfo = dateInput.split(" ")
@@ -557,7 +557,7 @@ async def on_message(message):
             f.close
             await message.channel.send("The important date has been added ⌚")
         except:
-
+            await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
 
     # ------------- SHOW DATE ---------------
     if message.content.startswith('$showImpDates'):
