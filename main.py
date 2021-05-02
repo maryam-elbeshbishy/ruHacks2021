@@ -241,21 +241,17 @@ async def on_message(message):
 
             if len(acronym)==0 or len(day)==0 or len(hour)==0 or len(link)==0:
                 await message.channel.send("🩹 **Please use the command as so: $addTime_Link CODE>DAY>TIME>MEETINGLINK**\n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nFor more information use $help")
-                print("here1")
                 return
 
             if not res2: 
                 await message.channel.send("🩹 **Please input a valid day and try again. Ex.(Monday)**")
-                print("here day")
                 return
             if not res1:
                 await message.channel.send("🩹 **Please input a valid time and try again.**")
-                print("here2")
                 return
 
             if not check_code(acronym):
                 await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
-                print("here3")
                 return
 
             scheduler.add_job(class_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], day_of_week=conv_day), id=acronym, args=(acronym, day, hour, link))
@@ -328,32 +324,38 @@ async def on_message(message):
             await message.channel.send("🩹 **Please use the command as so: $getClassTitle CODE**\nFor more information use $help")
 
 
-    # ---------------------------- GET MEETING LINK ---------------------------- ADLSKJDALSDJALKSDJA
+    # ---------------------------- GET CLASSCODE ---------------------------- ADLSKJDALSDJALKSDJA
     if message.content.startswith('$getClassCode'):   
         try:
             userInput = message.content[14:]
             information = userInput.split(seperator)
             check = information[0].strip()
-
-            if len(check)==0:
+            print(check)
+            if len(str(check))==0:
                 await message.channel.send("🩹 **Please use the command as so: $getClassCode TITLE**\nFor more information use $help")
+                print("here2")
                 return
-        
             cur.execute("""
                 SELECT courseCode FROM EduBot 
                 WHERE courseName = '{}';
             """.format(check))
             code = cur.fetchall()
+            print(code[0][0])
             conn.commit()
-            if code[0][0] == None:
+
+            print("here4")
+            print(code,"----")
+            if code == []:
                 await message.channel.send("There no is course code for {} 😯".format(check))
             else:
                 await message.channel.send("ℹ The course code of {} is: {}.".format(title, code[0][0]))
+            print("ding")
         except:
+            print("here3")
             await message.channel.send("🩹 **Please use the command as so: $getClassCode TITLE**\nFor more information use $help")
 
 
-    # ---------------------------- GET MEETING LINK ----------------------------
+    # ---------------------------- GET MEETINGLINK ----------------------------
     if message.content.startswith('$getMeetingLink'):
         try:
             userInput = message.content[16:]
@@ -549,11 +551,22 @@ async def on_message(message):
 
             conv_date = date_conversion(date)
             conv_hour = time_conversion(hour)
-     
-            scheduler.add_job(impDate_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], month=conv_date[0], day=conv_date[1], year=conv_date[2]), args=(title, date, hour))
+             
+            patterns =["^((((0[13578])|([13578])|(1[02]))[\/](([1-9])|([0-2][0-9])|(3[01])))|(((0[469])|([469])|(11))[\/](([1-9])|([0-2][0-9])|(30)))|((2|02)[\/](([1-9])|([0-2][0-9]))))[\/]\d{4}$|^\d{4}$","((1[0-2])|[1-9]):[0-5][0-9] (A|P)M"]
 
-            if len(title)==0 or len(dateInput)==0:
-                await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
+            res1 = re.match(patterns[0],date)
+            res2 = re.match(patterns[1],hour)
+    
+
+            if len(title)==0 or len(date)==0 or len(hour)==0:
+                await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nFor more information use $help")
+                return
+
+            if not res1:
+                await message.channel.send("🩹 **Please enter a valid date in the following format MM/DD/YYYY**")
+                return
+            if not res2:
+                await message.channel.send("🩹 **Please enter a valid time.**\n*Be sure to format the time as so: 00:00 AM or 00:00 PM*")
                 return
 
             f = open("ImpDates.txt", "a")
@@ -562,6 +575,8 @@ async def on_message(message):
                     " [ " + date + " @ " + hour + " ]" + "\n")
             count += 1
             f.close
+
+            scheduler.add_job(impDate_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], month=conv_date[0], day=conv_date[1], year=conv_date[2]), args=(title, date, hour))
             await message.channel.send("The important date has been added ⌚")
         except:
             await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
@@ -599,27 +614,40 @@ async def on_message(message):
 
     # ------------- REMOVE DATE ---------------
     if message.content.startswith('$removeImpDates'):
-        userInput = message.content[16:]
-        information = userInput.split(seperator)
-        f = open("ImpDates.txt", "r")
-        lines = f.readlines()
-        f.close
+        try:
+            userInput = message.content[16:]
+            information = userInput.split(seperator)
 
-        f2 = open("ImpDates.txt", "w")
-        for line in lines:
-            nLine = line.split(')')
+            if len(information[0])==0 :
+                await message.channel.send("🩹 **Please use the command as so: $removeImpDates NUMBER** \nFor more information use $help")
+                return
 
-            if(str(nLine[0][0]) == "~" or str(nLine[0][0]) == ""):
-                f2.write(line)
-            elif(int(nLine[0]) != int(information[0])):
-                f2.write(line)
+            f = open("ImpDates.txt", "r")
+            lines = f.readlines()
+            f.close
 
-            else:
-                await message.channel.send("The date has been removed :basket:")
-                line = "~~"+line+"~~\n"
-                f2.write(line)
+            if int(information[0])>len(lines):
+                await message.channel.send("🩹 **Please enter a valid number.**")
+                return
 
-        f2.close
+            f2 = open("ImpDates.txt", "w")
+            for line in lines:
+                nLine = line.split(')')
+
+                if(str(nLine[0][0]) == "~" or str(nLine[0][0]) == ""):
+                    f2.write(line)
+                elif(int(nLine[0]) != int(information[0])):
+                    f2.write(line)
+
+                else:
+                    await message.channel.send("The date has been removed :basket:")
+                    line = "~~"+line+"~~\n"
+                    f2.write(line)
+
+            f2.close
+        except:
+            await message.channel.send("🩹 **Please use the command as so: $removeImpDates NUMBER** \nFor more information use $help")
+
 
     # ---------------------------- HELP COMMAND ----------------------------
     if message.content.startswith('$help'):
