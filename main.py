@@ -23,14 +23,6 @@ conn.set_session(autocommit=True)
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
-
-conn = conn = psycopg2.connect(
-    database='whole-mink-215.edubotdb',
-    user='maryam',
-    password='Oulnmt4wZqd-bzwR',
-    host='free-tier5.gcp-europe-west1.cockroachlabs.cloud',
-    port=26257
-)
 cur = conn.cursor()
 scheduler = AsyncIOScheduler()
 
@@ -205,11 +197,6 @@ async def on_message(message):
         WHERE courseCode = '{}';
         """.format(link, day, hour, acronym))
 
-        show_dataBase()
-        await message.channel.send(acronym)
-        await message.channel.send(day)
-        await message.channel.send(hour)
-        await message.channel.send(link)
         await message.channel.send("The class information has been added 🏫")
 
     # ---------------------------- ADD TEXTBOOK ----------------------------
