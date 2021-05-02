@@ -97,7 +97,20 @@ def day_conversion(day):
     else:
         return "6"
 
+# ---------------------------- DATE CONVERSION ------------------------
+def date_conversion(date):
+    convertedDate = [0,0,0]
+    dateSplit = date.split("/")
+    month = dateSplit[0].lstrip('0')
+    day = dateSplit[1].lstrip('0')
+    year = dateSplit[2]
 
+    convertedDate[0] = month
+    convertedDate[1] = day
+    convertedDate[2] = year
+
+    return convertedDate
+    
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
@@ -521,10 +534,15 @@ async def on_message(message):
             userInput = message.content[13:]
             information = userInput.split(seperator)
             title = information[0]
-            dateInput = information[1]
+            date = information[1]
+            hour = information[2]
+
+            conv_date = date_conversion(date)
+            conv_hour = time_conversion(hour)
+     
 
             if len(title)==0 or len(dateInput)==0:
-                await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
+                await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
                 return
 
             dateInfo = dateInput.split(" ")
@@ -539,8 +557,6 @@ async def on_message(message):
             f.close
             await message.channel.send("The important date has been added ⌚")
         except:
-            await message.channel.send("🩹 **Please use the command as so: $addImpDates TITLE>MM/DD/YYYY>00:00 PM** \n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nnFor more information use $help")
-
 
 
     # ------------- SHOW DATE ---------------
