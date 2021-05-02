@@ -21,6 +21,7 @@ pip install cron-schedule-triggers
 To authorize the bot into discord:
 
 ```
+https://discord.com/api/oauth2/authorize?client_id=837782902066511902&permissions=0&scope=bot
 ```
 
 ## Introduction
