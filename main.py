@@ -226,19 +226,19 @@ async def on_message(message):
             userInput = message.content[14:]
             information = userInput.split(seperator)
             acronym = information[0].strip().upper()
-            day = information[1].strip()
+            day = information[1].title().strip()
             hour = information[2]
             link = information[3].strip()
 
-            patterns =["((1[0-2])|[1-9]):[0-5][0-9] (A|P)M","((m|M)on|(t|T)ues|(w|W)ednes|(T|t)hurs|(f|F)ri)day"]
-    
+            patterns =["((1[0-2])|[1-9]):[0-5][0-9] (A|P)M","(Monday|Tuesday|Wednesday|Tursday|Friday|Saturday|Sunday)"]
+            print("here2")
+            
             res1 = re.match(patterns[0],hour)
             res2 = re.match(patterns[1],day)
 
-
             conv_hour = time_conversion(hour)
             conv_day = day_conversion(day)
-
+            print(len(acronym),len(day),len(hour),len(link))
             if len(acronym)==0 or len(day)==0 or len(hour)==0 or len(link)==0:
                 await message.channel.send("🩹 **Please use the command as so: $addTime_Link CODE>DAY>TIME>MEETINGLINK**\n*Be sure to format the time as so: 00:00 AM or 00:00 PM*\nFor more information use $help")
                 return
