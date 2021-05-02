@@ -5,13 +5,13 @@ from discord.ext import commands, tasks
 from discord.ext.commands import Bot
 from dotenv import load_dotenv
 import psycopg2
-
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from discord.utils import find
-
 import time
+
 channel_ID = 0
+
 # ---------------------------- CONNECTING & CONFIGURATIONS ------------------------
 conn = psycopg2.connect(
     database='whole-mink-215.edubotdb',
@@ -29,8 +29,6 @@ cur = conn.cursor()
 scheduler = AsyncIOScheduler()
 
 # ---------------------------- DATABASE ------------------------
-
-
 def show_dataBase():
     print("\n\n\n\n")
     cur.execute("SELECT * FROM EduBot;")
@@ -51,8 +49,6 @@ def check_code(code):
     return True
 
 # ---------------------------- 24 HOUR TIME CONVERSION ------------------------
-
-
 def time_conversion(time):
     timeSplit = time.split(":")
     minuteSplit = timeSplit[1].split(" ")
@@ -79,8 +75,6 @@ def time_conversion(time):
     return convertedTime
 
 # ---------------------------- DAY CONVERSION ------------------------
-
-
 def day_conversion(day):
     if day.lower() == "monday":
         return "0"
@@ -96,6 +90,20 @@ def day_conversion(day):
         return "5"
     else:
         return "6"
+
+# ---------------------------- DATE CONVERSION ------------------------
+def date_conversion(date):
+    convertedDate = [0,0,0]
+    dateSplit = date.split("/")
+    month = dateSplit[0].lstrip('0')
+    day = dateSplit[1].lstrip('0')
+    year = dateSplit[2]
+
+    convertedDate[0] = month
+    convertedDate[1] = day
+    convertedDate[2] = year
+
+    return convertedDate
 
 
 @client.event
@@ -114,7 +122,9 @@ async def on_ready():
     """)
 
 # ---------------------------- NOTIFICATION TESTING ------------------------
-async def job(acronym, day, hour, link):
+
+# ------------- CLASS NOTIFICAITION ---------------
+async def class_notification(acronym, day, hour, link):
     channel = client.get_channel(channel_ID)
     cur.execute("""
         SELECT courseName FROM EduBot
@@ -126,6 +136,15 @@ async def job(acronym, day, hour, link):
     embed=discord.Embed(title=":alarm_clock: You have {} right now!".format(title[0][0]), description="{} takes place on {} at {}".format(acronym,day.title(),hour), color=0xb0d6ee)
     embed.add_field(name="Zoom Link: ", value=link, inline=True)
     await channel.send(embed=embed)
+
+
+# ------------- IMPORTANT DATE NOTIFICAITION ---------------
+async def impDate_notification(title, date, hour):
+    channel = client.get_channel(838199083491524659)
+
+    embed=discord.Embed(title=":alarm_clock: You have {} right now!".format(title), description="{} at {}".format(date,hour), color=0xb0d6ee)
+    await channel.send(embed=embed)
+
 
 @client.event
 async def on_guild_join(guild):
@@ -145,6 +164,7 @@ async def on_message(message):
         global channel_ID 
         channel_ID = userInput
         
+        
     # ---------------------------- ADDING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$addClass'):
         userInput = message.content[10:]
@@ -161,6 +181,7 @@ async def on_message(message):
         await message.channel.send("The class has been added 🏫")
         show_dataBase()
 
+
     # ---------------------------- REMOVING CLASS TITLE + ACRONYM ----------------------------
     if message.content.startswith('$removeClass'):
         userInput = message.content[13:]
@@ -174,7 +195,7 @@ async def on_message(message):
             cur.execute("""
             DELETE FROM EduBot WHERE courseCode = '{}';
             """.format(acronym))
-            scheduler.remove_job(acronym)
+            scheduler.remove_class_notification(acronym)
             await message.channel.send("The class has been removed :basket:")
         except:
             cur.execute("""
@@ -201,7 +222,7 @@ async def on_message(message):
             await message.channel.send("There is no information for '{}' 😯\n Use $addClass to add some.".format(acronym))
             return
 
-        scheduler.add_job(job, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], day_of_week=conv_day), id=acronym, args=(acronym, day, hour, link))
+        scheduler.add_job(class_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], day_of_week=conv_day), id=acronym, args=(acronym, day, hour, link))
 
         cur.execute("""
         UPDATE EduBot
@@ -210,6 +231,7 @@ async def on_message(message):
         """.format(link, day, hour, acronym))
 
         await message.channel.send("The class information has been added 🏫")
+
 
     # ---------------------------- ADD TEXTBOOK ----------------------------
     if message.content.startswith('$addTextbook'):
@@ -231,6 +253,7 @@ async def on_message(message):
 
     if "chick" in message.content:
         await message.channel.send("hello")
+
 
     # ---------------------------- GET CLASS TITLE ----------------------------
     if message.content.startswith('$getClassTitle'):
@@ -254,6 +277,7 @@ async def on_message(message):
         else:
             await message.channel.send("ℹ The course title of {} is: {}.".format(acronym, title[0][0]))
 
+
     # ---------------------------- GET MEETING LINK ----------------------------
     if message.content.startswith('$getClassCode'):
         userInput = message.content[14:]
@@ -275,6 +299,7 @@ async def on_message(message):
         else:
             await message.channel.send("ℹ The course code of {} is: {}.".format(title, code[0][0]))
 
+
     # ---------------------------- GET MEETING LINK ----------------------------
     if message.content.startswith('$getMeetingLink'):
         userInput = message.content[16:]
@@ -294,6 +319,7 @@ async def on_message(message):
             await message.channel.send("There is no meeting link for {} 😯".format(acronym))
         else:
             await message.channel.send("🔗 The meeting link for {} is: {}".format(acronym, link[0][0]))
+
 
     # ---------------------------- GET TEXTBOOK ----------------------------
     if message.content.startswith('$getTextbook'):
@@ -315,6 +341,7 @@ async def on_message(message):
             await message.channel.send("There is no textbook link for {} 😯".format(acronym))
         else:
             await message.channel.send("🔗 The textbook link for {} is: {}".format(acronym, text[0][0]))
+
 
     # ---------------------------- SCHEDULE ----------------------------
 
@@ -338,6 +365,7 @@ async def on_message(message):
             title="Weekly Schedule", description="Here is your weekly schedule 💼", color=discord.Color.blue())
         embed.add_field(name="This Week", value=lst, inline=True)
         await message.channel.send(embed=embed)
+
 
     # ------------- CLEAR SCHEDULE ---------------
     if message.content.startswith('$clearSchedule'):
@@ -372,7 +400,6 @@ async def on_message(message):
         await message.channel.send("The task(s) has been added ⌚")
 
 
-
     # ------------- SHOW TO DO ---------------
     if message.content.startswith('$showToDo'):
         lst = ""
@@ -396,6 +423,7 @@ async def on_message(message):
             title="Todo List", description="Here is a list of the things you have to get done 💼")
         embed.add_field(name="List", value=lst, inline=True)
         await message.channel.send(embed=embed)
+
 
     # ------------- REMOVE TO DO ---------------
     if message.content.startswith('$removeToDo'):
@@ -427,6 +455,7 @@ async def on_message(message):
         open('toDoList.txt', 'w').close()
         await message.channel.send("Todo List has been cleared✅")
 
+
     # ---------------------------- IMPORTANT DATES ----------------------------
 
     # ------------- ADD DATE ---------------
@@ -434,11 +463,13 @@ async def on_message(message):
         userInput = message.content[13:]
         information = userInput.split(seperator)
         title = information[0]
-        dateInput = information[1]
+        date = information[1]
+        hour = information[2]
 
-        dateInfo = dateInput.split(" ")
-        date = dateInfo[0]
-        hour = dateInfo[1]
+        conv_date = date_conversion(date)
+        conv_hour = time_conversion(hour)
+
+        scheduler.add_job(impDate_notification, CronTrigger(hour=conv_hour[0], minute=conv_hour[1], month=conv_date[0], day=conv_date[1], year=conv_date[2]), args=(title, date, hour))
 
         f = open("ImpDates.txt", "a")
         count = len(open("ImpDates.txt").readlines()) + 1
@@ -447,6 +478,7 @@ async def on_message(message):
         count += 1
         f.close
         await message.channel.send("The important date has been added ⌚")
+
 
     # ------------- SHOW DATE ---------------
     if message.content.startswith('$showImpDates'):
@@ -473,10 +505,12 @@ async def on_message(message):
         embed.add_field(name="List", value=lst, inline=True)
         await message.channel.send(embed=embed)
 
+
     # ------------- CLEAR DATE ---------------
     if message.content.startswith('$clearImpDates'):
         open('ImpDates.txt', 'w').close()
         await message.channel.send("Important dates has been cleared ✅")
+
 
     # ------------- REMOVE DATE ---------------
     if message.content.startswith('$removeImpDates'):
@@ -501,6 +535,7 @@ async def on_message(message):
                 f2.write(line)
 
         f2.close
+
 
     # ---------------------------- HELP COMMAND ----------------------------
     if message.content.startswith('$help'):
